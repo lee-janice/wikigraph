@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import WikiGraph from './wikigraph';
 
@@ -12,7 +11,7 @@ function App() {
     return (
 		<div className="App">
 			<WikiGraph
-				width={700}
+				width={900}
 				height={600}
 				containerId={"viz"}
 				serverDatabase={NEO4J_DB}

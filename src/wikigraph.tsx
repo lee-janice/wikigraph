@@ -73,7 +73,16 @@ const WikiGraph: React.FC<Props> = ({
         const viz = new NeoVis(config);
         viz.render();
     }, []);
-    return (<div id={containerId} style={{ width: `${width}px`, height: `${height}px`, }}></div>);
+    return (
+        <div id={containerId} 
+            style={{ 
+                width: `${width}px`, 
+                height: `${height}px`,
+                border: `1px solid lightgray`, 
+                display: `inline-block;`,
+            }}
+        />
+    );
 };
 
 export default WikiGraph;
