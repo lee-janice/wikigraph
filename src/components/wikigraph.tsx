@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig } from "neovis.js/dist/neovis.js";
 
 interface Props {
@@ -9,18 +9,36 @@ interface Props {
     serverURI: string,
     serverUser: string,
     serverPassword: string,
+    search: string
 };
 
-const WikiGraph: React.FC<Props> = ({
-    width, 
-    height, 
-    containerId, 
-    serverDatabase, 
-    serverURI,
-    serverUser,
-    serverPassword,
-}) => {
-    const vizRef = useRef();
+const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
+    const { width, height, containerId, serverDatabase, serverURI, serverUser, serverPassword, search } = props;
+    const [vis, updateVis] = useState(new NeoVis({
+        containerId: "vis",
+    }));
+
+	useEffect(() => {
+        // TODO: replace this with something that does not open the DB up to an injection attack
+		var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page) \
+                    WHERE toLower(p1.title) = toLower("'+search+'") \
+                    RETURN p1, l, p2 \
+                    ORDER BY l.quantity DESC';
+
+        // TODO: replace with fuzzy match, only return the closest match to the string
+        // var cypher = "MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page) \
+        // 				WHERE apoc.text.fuzzyMatch(p1.title, '"+article+"') \
+        // 				RETURN p1, l, p2 \
+        // 				ORDER BY l.quantity DESC \
+        // 				LIMIT 10"
+
+        if (cypher.length > 0) {
+            vis?.renderWithCypher(cypher);
+        } else {
+            vis?.reload();
+        }
+	}, [search]);
+
     useEffect(() => {
         var config: NeovisConfig = {
             // nonFlat: true, 
@@ -91,16 +109,18 @@ const WikiGraph: React.FC<Props> = ({
                             RETURN p1, l, p2 \
                             ORDER BY l.quantity DESC"
         };
-        const viz: NeoVis = new NeoVis(config);
-        viz.render();
+        const vis: NeoVis = new NeoVis(config);
+        vis.render();
+        updateVis(vis);
         // viz?.network?.on("stabilizationIterationsDone", function () {
         //     viz?.network?.setOptions( { physics: false } );
         // });
         // viz?.network?.setOptions( { physics: false } );
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
+
     return (
         <div id={containerId} 
-            // ref={vizRef}
+            ref={ref}
             style={{ 
                 float: `left`,
                 width: `${width}px`, 
@@ -111,6 +131,6 @@ const WikiGraph: React.FC<Props> = ({
             }}
         />
     );
-};
+});
 
 export default WikiGraph;

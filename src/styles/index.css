@@ -36,7 +36,7 @@ input[type=submit] {
 }
 
 input:focus {
-  outline: 1px solid darkgray; /* add outline when input fields are clicked */
+  outline: 1px solid gray; /* add outline when input fields are clicked */
 }
 
 /*----------------------------------------------------------------------------*/
@@ -60,5 +60,6 @@ input:focus {
   float: left;
   margin: 2% 4.5%;
   width: 95%;
-  bottom: 0; 
+  position: absolute;
+  bottom: 2%; 
 }
