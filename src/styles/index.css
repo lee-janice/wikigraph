@@ -1,5 +1,8 @@
+/*----------------------------------------------------------------------------*/
+/* 0. general styling 
+/*----------------------------------------------------------------------------*/
 body {
-  margin: 2.5% 5%;
+  margin: 2% 4.5%;
   background-color: #fffff8;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -11,4 +14,51 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* ----- input fields ----- */
+input[type=search] {
+  margin: 1em;
+  padding: 10px 15px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  height: 36px;
+  width: 66%;
+  -moz-tap-highlight-color: rgba(0,0,0,0.15);
+}
+
+input[type=submit] {
+  padding: 10px 5px;
+  background-color: white;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input:focus {
+  outline: 1px solid darkgray; /* add outline when input fields are clicked */
+}
+
+/*----------------------------------------------------------------------------*/
+/* 1. sidebar styling 
+/*----------------------------------------------------------------------------*/
+/* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
+.sidebar {
+  height: 100%; 
+  width: 33%;
+  position: fixed; /* stay in place on scroll */
+  z-index: 1; 
+  top: 0; 
+  right: 0;
+  background-color: #fffff8; 
+  overflow-x: hidden; /* disable horizontal scroll */
+  padding-top: 20px;
+  border: 1px solid lightgray;
+}
+
+.search-bar {
+  float: left;
+  margin: 2% 4.5%;
+  width: 95%;
+  bottom: 0; 
 }

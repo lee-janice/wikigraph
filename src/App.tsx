@@ -2,6 +2,7 @@ import React from 'react';
 import './styles/App.css';
 import WikiGraph from './components/wikigraph';
 import Layout from './components/layout';
+import Sidebar from './components/sidebar';
 
 const NEO4J_DB = String(process.env.REACT_APP_NEO4J_DB);
 const NEO4J_URI = String(process.env.REACT_APP_NEO4J_URI);
@@ -26,6 +27,8 @@ function App() {
 				serverUser={NEO4J_USER}
 				serverPassword={NEO4J_PASSWORD}
 			/>
+			{/* sidebar  */}
+			<Sidebar></Sidebar>
 		</div>
 		</Layout>
     )
