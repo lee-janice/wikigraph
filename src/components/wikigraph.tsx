@@ -1,7 +1,13 @@
 import React, { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig } from "neovis.js/dist/neovis.js";
 
+const NEO4J_DB = String(process.env.REACT_APP_NEO4J_DB);
+const NEO4J_URI = String(process.env.REACT_APP_NEO4J_URI);
+const NEO4J_USER = String(process.env.REACT_APP_NEO4J_USER);
+const NEO4J_PASSWORD = String(process.env.REACT_APP_NEO4J_PASSWORD);
+
 interface Props {
+    search: string
     width: number, 
     height: number,
     containerId: string,
@@ -9,14 +15,11 @@ interface Props {
     serverURI: string,
     serverUser: string,
     serverPassword: string,
-    search: string
 };
 
 const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
-    const { width, height, containerId, serverDatabase, serverURI, serverUser, serverPassword, search } = props;
-    const [vis, updateVis] = useState(new NeoVis({
-        containerId: "vis",
-    }));
+    const {  search, width, height, containerId, serverDatabase, serverURI, serverUser, serverPassword, } = props;
+    const [vis, updateVis] = useState<NeoVis|null>(null);
 
 	useEffect(() => {
         // TODO: replace this with something that does not open the DB up to an injection attack
@@ -32,6 +35,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         // 				ORDER BY l.quantity DESC \
         // 				LIMIT 10"
 
+        // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
         if (cypher.length > 0) {
             vis?.renderWithCypher(cypher);
         } else {
@@ -77,6 +81,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         avoidOverlap: 1, // value between 0 and 1, 1 is maximum overlap avoidance 
                         centralGravity: 0.6
                     }, 
+                    maxVelocity: 15,
                     stabilization: { iterations: 100 }
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click 
@@ -112,10 +117,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         const vis: NeoVis = new NeoVis(config);
         vis.render();
         updateVis(vis);
-        // viz?.network?.on("stabilizationIterationsDone", function () {
-        //     viz?.network?.setOptions( { physics: false } );
+        // vis?.network?.on("stabilizationIterationsDone", function () {
+        //     vis?.network?.setOptions( { physics: false } );
         // });
-        // viz?.network?.setOptions( { physics: false } );
+        // vis?.network?.setOptions( { physics: false } );
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
     return (

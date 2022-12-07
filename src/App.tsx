@@ -15,22 +15,16 @@ function App() {
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
 
-	const handleChange = (event: { target: { value: string; }; }) => {
-		setInput(event.target.value);
-    }
-
-    const handleClick = () => {
-		setSearch(input);
-    }
-
 	// keep track of wikigraph reference
 	const visRef = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		console.log("search: ", search)
-		// visRef.current
-		// visRef?.current?.handleSearch(search);
-	}, [search]);
+	const handleSearchChange = (event: { target: { value: string; }; }) => {
+		setInput(event.target.value);
+    }
+
+    const handleSearch = () => {
+		setSearch(input);
+    }
 
     return (
 		<Layout>
@@ -41,7 +35,10 @@ function App() {
 			<div className="App">
 				{/* graph visualization */}
 				<WikiGraph
+					// pass a reference object and the search state to the wikigraph child component
+					// so we can update the visualization when the search state changes 
 					ref={visRef}
+					search={search}
 					width={900}
 					height={600}
 					containerId={"vis"}
@@ -49,15 +46,16 @@ function App() {
 					serverURI={NEO4J_URI}
 					serverUser={NEO4J_USER}
 					serverPassword={NEO4J_PASSWORD}
-					search={search}
 				/>
 				{/* sidebar  */}
 				<div className="sidebar">
 					<CurrentNodes/>
 					<div className="search-bar">
 						Search for a Wikipedia article:<br/>
-						<input type="search" id="search" placeholder="Article title" onChange={handleChange}/>
-						<input type="submit" value="Submit" id="reload" onClick={handleClick}/>
+						<form id="search" action="#" onSubmit={handleSearch}>
+							<input type="search" id="search" placeholder="Article title" onChange={handleSearchChange}/>
+							<input type="submit" value="Submit" id="reload" onClick={handleSearch}/>
+						</form>
 					</div>
 				</div>
 			</div>
