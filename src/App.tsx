@@ -1,9 +1,9 @@
 import './styles/App.css';
 import WikiGraph from './components/wikigraph';
 import Layout from './components/layout';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import CurrentNodes from './components/currentNodes';
-import SearchBar from './components/searchbar';
+import SelectedNodes from './components/selectedNodes';
 
 const NEO4J_DB = String(process.env.REACT_APP_NEO4J_DB);
 const NEO4J_URI = String(process.env.REACT_APP_NEO4J_URI);
@@ -14,17 +14,23 @@ function App() {
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
+	// update state for user search
+	const handleSearchChange = (event: { target: { value: string; }; }) => {
+		setInput(event.target.value);
+    };
+    const handleSearch = () => {
+		setSearch(input);
+    };
+
+	// keep track of selected nodes 
+	const [selection, setSelection] = useState([""]);
+	// update state for user selection
+	const handleSelect = (selection: string[]) => {
+		setSelection(selection);
+	};
 
 	// keep track of wikigraph reference
 	const visRef = useRef<HTMLDivElement>(null);
-
-	const handleSearchChange = (event: { target: { value: string; }; }) => {
-		setInput(event.target.value);
-    }
-
-    const handleSearch = () => {
-		setSearch(input);
-    }
 
     return (
 		<Layout>
@@ -38,7 +44,6 @@ function App() {
 					// pass a reference object and the search state to the wikigraph child component
 					// so we can update the visualization when the search state changes 
 					ref={visRef}
-					search={search}
 					width={900}
 					height={600}
 					containerId={"vis"}
@@ -46,10 +51,14 @@ function App() {
 					serverURI={NEO4J_URI}
 					serverUser={NEO4J_USER}
 					serverPassword={NEO4J_PASSWORD}
+					search={search}
+					handleSelect={handleSelect}
 				/>
 				{/* sidebar  */}
 				<div className="sidebar">
 					<CurrentNodes/>
+					<br/>
+					<SelectedNodes selection={selection}/>
 					<div className="search-bar">
 						Search for a Wikipedia article:<br/>
 						<form id="search" action="#" onSubmit={handleSearch}>
