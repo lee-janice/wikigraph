@@ -1,5 +1,7 @@
 import { ForwardedRef, forwardRef, useEffect, useState } from "react";
-import NeoVis, { NeovisConfig } from "neovis.js/dist/neovis.js";
+import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
+import CurrentNodes from "./currentNodes";
+import SelectedNodes from "./selectedNodes";
 
 export type IdType = string | number;
 
@@ -9,16 +11,17 @@ interface Props {
     serverURI: string,
     serverUser: string,
     serverPassword: string,
-    search: string,
-    stabilize: boolean,
-    handleStabilize: (a: boolean) => void,
-    handleSelect: (a: IdType[] | undefined) => void,
 };
 
 const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
-    const {  containerId, serverDatabase, serverURI, serverUser, serverPassword, 
-        search, handleSelect, } = props;
+    const {  containerId, serverDatabase, serverURI, serverUser, serverPassword, } = props;
+    // keep vis object in state
     const [vis, updateVis] = useState<NeoVis|null>(null);
+	// keep track of selected nodes 
+	const [selection, setSelection] = useState<IdType[]|undefined>();
+	// keep track of search bar input
+	const [input, setInput] = useState("");
+	const [search, setSearch] = useState("Universe");
 
     // initialize visualization and neovis object
     useEffect(() => {
@@ -60,31 +63,23 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         damping: 0.5
                     }, 
                     maxVelocity: 15,
-                    // stabilization: { iterations: 100 }
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click 
-                layout: {
-                    randomSeed: 47,
-                    // improvedLayout: true,
-                },
+                layout: { randomSeed: 47, },
             },
             // node and edge settings 
-            labels: {
-                Page: {
-                    label: "title",
-                    size: "clicksInto",
-                },
-            },
-            relationships: {
-                LINKS_TO: {
-                    value: "quantity",
-                },
-            },
+            labels: { Page: { label: "title", size: "clicksInto", }, },
+            relationships: { LINKS_TO: { value: "quantity", }, },
             initialCypher: "MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = 'Universe' RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10"
         };
         const vis: NeoVis = new NeoVis(config);
         vis.render();
         updateVis(vis);
+
+        vis.registerOnEvent(NeoVisEvents.ClickNodeEvent, (e) => {
+            console.log(e);
+            setSelection(vis.network?.getSelectedNodes());
+        })
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
     // execute cypher query when user inputs search, update visualization
@@ -103,12 +98,8 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         }
 	}, [search, vis]);
 
-    // if user clicks on the visualization, update the parent "selection" state
-    const handleClick = () => {
-        handleSelect(vis?.network?.getSelectedNodes());
-    }
-
     return (
+        <div>
         <div style={{ height: `80%`, width: `60%`, position: `fixed`, }}>
             <div id={containerId} 
                 ref={ref}
@@ -119,10 +110,24 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     border: `1px solid lightgray`, 
                     backgroundColor: `#fffff8`,
                 }}
-                onClick={handleClick}
+                // onClick={handleClick}
             />
             <input type="submit" value="Stabilize" id="stabilize" onClick={() => vis?.stabilize()}/>
             <input type="submit" value="Center" id="center" onClick={() => vis?.network?.fit()}/>
+        </div>
+        {/* sidebar */}
+        <div className="sidebar">
+            <CurrentNodes/>
+            <br/>
+            <SelectedNodes selection={selection}/>
+            <div className="search-bar">
+                Search for a Wikipedia article:<br/>
+                <form id="search" action="#" onSubmit={() => setSearch(input)}>
+                    <input type="search" id="search" placeholder="Article title" onChange={(e) => setInput(e.target.value)}/>
+                    <input type="submit" value="Submit" id="submit" onClick={() => setSearch(input)}/>
+                </form>
+            </div>
+        </div>
         </div>
     );
 });
