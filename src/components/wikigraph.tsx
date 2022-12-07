@@ -1,6 +1,5 @@
 import { ForwardedRef, forwardRef, useEffect, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
-import CurrentNodes from "./currentNodes";
 import SelectedNodes from "./selectedNodes";
 
 export type IdType = string | number;
@@ -22,7 +21,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
-
+    
     // initialize visualization and neovis object
     useEffect(() => {
         var config: NeovisConfig = {
@@ -76,11 +75,30 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         vis.render();
         updateVis(vis);
 
-        vis.registerOnEvent(NeoVisEvents.ClickNodeEvent, (e) => {
-            console.log(e);
-            setSelection(vis.network?.getSelectedNodes());
+        vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
+            vis.network?.on("select", (e) => {
+                console.log(e);
+                console.log("select");
+                setSelection(vis.network?.getSelectedNodes());
+            });
+
+            vis.network?.on("doubleClick", (e) => {
+                console.log(e);
+                console.log("doubleClicked");
+                // setSelection(vis.network?.getSelectedNodes());
+            });
         })
+
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
+
+    const handleUpdateWithSelection = () => {
+        if (selection){
+            var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("'+selection+'", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT '+10*selection.length;
+            vis?.renderWithCypher(cypher);
+            console.log(vis?.network?.getSelectedNodes());
+            setSelection([""]);
+        }
+    };
 
     // execute cypher query when user inputs search, update visualization
 	useEffect(() => {
@@ -100,6 +118,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
     return (
         <div>
+        {/* graph visualization */}
         <div style={{ height: `80%`, width: `60%`, position: `fixed`, }}>
             <div id={containerId} 
                 ref={ref}
@@ -117,9 +136,9 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         </div>
         {/* sidebar */}
         <div className="sidebar">
-            <CurrentNodes/>
-            <br/>
             <SelectedNodes selection={selection}/>
+            <br/>
+            <input type="submit" value="Generate with Selection" id="submit" onClick={handleUpdateWithSelection}/>
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>
                 <form id="search" action="#" onSubmit={() => setSearch(input)}>
