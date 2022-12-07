@@ -1,5 +1,5 @@
 import './styles/App.css';
-import WikiGraph from './components/wikigraph';
+import WikiGraph, { IdType } from './components/wikigraph';
 import Layout from './components/layout';
 import { useRef, useState } from 'react';
 import CurrentNodes from './components/currentNodes';
@@ -17,17 +17,23 @@ function App() {
 	// update state for user search
 	const handleSearchChange = (event: { target: { value: string; }; }) => {
 		setInput(event.target.value);
-    };
-    const handleSearch = () => {
+	};
+	const handleSearch = () => {
 		setSearch(input);
-    };
+	};
 
 	// keep track of selected nodes 
-	const [selection, setSelection] = useState([""]);
+	const [selection, setSelection] = useState<IdType[]|undefined>();
 	// update state for user selection
-	const handleSelect = (selection: string[]) => {
-		setSelection(selection);
+	const handleSelect = (selection: IdType[] | undefined) => {
+		if (selection) { setSelection(selection); }
 	};
+	
+	// keep track of whether to stabilize or not
+	const [stabilize, setStabilize] = useState(false);
+	const handleStabilize = (stabilize: boolean) => {
+		setStabilize(stabilize)
+	}
 
 	// keep track of wikigraph reference
 	const visRef = useRef<HTMLDivElement>(null);
@@ -44,18 +50,19 @@ function App() {
 					// pass a reference object and the search state to the wikigraph child component
 					// so we can update the visualization when the search state changes 
 					ref={visRef}
-					width={900}
-					height={600}
 					containerId={"vis"}
 					serverDatabase={NEO4J_DB}
 					serverURI={NEO4J_URI}
 					serverUser={NEO4J_USER}
 					serverPassword={NEO4J_PASSWORD}
 					search={search}
+					stabilize={stabilize}
+					handleStabilize={handleStabilize}
 					handleSelect={handleSelect}
 				/>
-				{/* sidebar  */}
+				{/* sidebar */}
 				<div className="sidebar">
+					{/* <input type="submit" value="Stabilize" id="stabilize" onClick={(() => setStabilize(true))}/> */}
 					<CurrentNodes/>
 					<br/>
 					<SelectedNodes selection={selection}/>

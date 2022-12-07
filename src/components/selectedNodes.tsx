@@ -1,14 +1,14 @@
-import React, {useEffect} from "react";
+import React from "react";
+import { IdType } from "./wikigraph";
 
 interface Props {
-    selection: string[],
+    selection: IdType[] | undefined,
 };
 
 const SelectedNodes: React.FC<Props> = ({ selection }) => {
-    useEffect(() => {}, []);
     return (
         <div className="selected-nodes">
-            Selected nodes: {selection.toString()}
+            Selected nodes: {selection?.toString()}
         </div>
     );
 };

@@ -39,6 +39,14 @@ input:focus {
   outline: 1px solid gray; /* add outline when input fields are clicked */
 }
 
+#stabilize {
+  position: absolute;
+  z-index: 10;
+  margin: 10px 10px; 
+  bottom: 0px;
+  left: 0px; 
+}
+
 /*----------------------------------------------------------------------------*/
 /* 1. sidebar styling 
 /*----------------------------------------------------------------------------*/
