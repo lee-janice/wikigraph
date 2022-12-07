@@ -62,7 +62,6 @@ function App() {
 				/>
 				{/* sidebar */}
 				<div className="sidebar">
-					{/* <input type="submit" value="Stabilize" id="stabilize" onClick={(() => setStabilize(true))}/> */}
 					<CurrentNodes/>
 					<br/>
 					<SelectedNodes selection={selection}/>

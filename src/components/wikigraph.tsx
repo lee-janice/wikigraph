@@ -17,13 +17,12 @@ interface Props {
 
 const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const {  containerId, serverDatabase, serverURI, serverUser, serverPassword, 
-        search, stabilize, handleStabilize, handleSelect, } = props;
+        search, handleSelect, } = props;
     const [vis, updateVis] = useState<NeoVis|null>(null);
 
     // initialize visualization and neovis object
     useEffect(() => {
         var config: NeovisConfig = {
-            // nonFlat: true, 
             containerId: containerId,
             // neo4j database connection settings 
             serverDatabase: serverDatabase, // specify which database to read from 
@@ -59,12 +58,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         avoidOverlap: 1, // value between 0 and 1, 1 is maximum overlap avoidance 
                         gravitationalConstant: -15000,
                         damping: 0.5
-                        // centralGravity: 0.6
                     }, 
-                    // hierarchicalRepulsion: {
-                    //     avoidOverlap: 0.6, // value between 0 and 1, 1 is maximum overlap avoidance 
-                    //     nodeDistance: 300
-                    // },
                     maxVelocity: 15,
                     // stabilization: { iterations: 100 }
                 },
@@ -91,10 +85,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         const vis: NeoVis = new NeoVis(config);
         vis.render();
         updateVis(vis);
-        // vis?.network?.on("stabilizationIterationsDone", function () {
-        //     vis?.network?.setOptions( { physics: false } );
-        // });
-        // vis?.network?.setOptions( { physics: false } );
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
     // execute cypher query when user inputs search, update visualization
@@ -113,24 +103,13 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         }
 	}, [search, vis]);
 
-    // execute cypher query when user inputs search, update visualization
-	useEffect(() => {
-        // vis?.stabilize();
-        console.log(vis?.stabilize)
-        handleStabilize(false);
-	}, [stabilize, vis]);
-
     // if user clicks on the visualization, update the parent "selection" state
     const handleClick = () => {
         handleSelect(vis?.network?.getSelectedNodes());
     }
 
     return (
-        <div style={{
-            height: `80%`,
-            width: `60%`, 
-            position: `fixed`,
-        }}>
+        <div style={{ height: `80%`, width: `60%`, position: `fixed`, }}>
             <div id={containerId} 
                 ref={ref}
                 style={{ 
@@ -143,6 +122,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 onClick={handleClick}
             />
             <input type="submit" value="Stabilize" id="stabilize" onClick={() => vis?.stabilize()}/>
+            <input type="submit" value="Center" id="center" onClick={() => vis?.network?.fit()}/>
         </div>
     );
 });
