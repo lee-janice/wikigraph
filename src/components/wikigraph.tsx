@@ -1,8 +1,13 @@
 import { ForwardedRef, forwardRef, useEffect, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
+import WikipediaSummaries from "./wikipediaSummaries";
 
 export type IdType = string | number;
+export type WikiSummary = {
+    title: string,
+    text: string,
+}
 
 interface Props {
     containerId: string,
@@ -19,6 +24,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 	// keep track of selected nodes and labels
 	const [selection, setSelection] = useState<IdType[]|undefined>();
 	const [selectionLabels, setSelectionLabels] = useState([""]);
+    // keep track of summaries 
+    // const [summaries, setSummaries] = useState<string[]>([])
+    // const [summaryTitles, setSummaryTitles] = useState<string[]>([])
+    const [summaries, setSummaries] = useState<WikiSummary[]>();
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
@@ -105,9 +114,73 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             vis?.renderWithCypher(cypher);
             // reset selection state once graph is re-rendered
             setSelection([""]);
-            setSelectionLabels([""])
+            setSelectionLabels([""]);
         }
     };
+
+    const handleWikipediaSearch = async () => {
+        async function searchWikipedia(searchQuery: string): Promise<{title: string, pageid: string}> {
+            const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&origin=*`;
+
+            const response = await fetch(endpoint);
+            // if request failed, throw an error
+            if (!response.ok) {
+              throw Error(response.statusText);
+            }
+
+            const json = await response.json();
+            // if no search results returned, throw an error 
+            if (json.query.search.length === 0) {
+                throw Error(`No Wikipedia articles for ${searchQuery} were found.`);
+            }
+
+            // return the Page ID of the best match
+            const bestMatch = json.query.search[0];
+            return {title: bestMatch.title, pageid: bestMatch.pageid.toString()} ;
+        };
+
+        async function getWikipediaExtract(pageid: string) {
+            const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro&explaintext&pageids=${pageid}&origin=*`;
+
+            const response = await fetch(endpoint);
+            // if request failed, throw an error
+            if (!response.ok) {
+              throw Error(response.statusText);
+            }
+
+            const json = await response.json();
+            // setSummaryTitles([...summaryTitles, title]);
+            // setSummaries([...summaries, json.query.pages[pageid].extract]);
+            console.log(json);
+            return json.query.pages[pageid].extract;
+        };
+
+        // if (selectionLabels) {
+        var summaries: Array<WikiSummary> = [];
+        // var extracts: Array<string> = [];
+        // console.log(selectionLabels);
+        selectionLabels.map(async (label) => {
+            const result = await searchWikipedia(label); 
+            summaries.push({
+                title: result.title,
+                text: await getWikipediaExtract(result.pageid),
+            })
+            // titles.push(result.title);
+            // extracts.push(await getWikipediaExtract(result.pageid));
+            // const extract = await getWikipediaExtract(await searchWikipedia(label));
+            // extracts.push(extract);
+            // await getWikipediaExtract(await searchWikipedia(label));
+        });
+
+        // setSummaryTitles(titles);
+        setSummaries(summaries);
+        console.log(summaries);
+
+        // setSummaries(extracts);
+        // setSummaryTitles(selectionLabels);
+        // console.log(extract);
+        // }
+    }
 
     // execute cypher query when user inputs search, update visualization
 	useEffect(() => {
@@ -145,12 +218,14 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         {/* sidebar */}
         <div className="sidebar">
             <SelectedNodes selectionLabels={selectionLabels}/>
-            <input type="submit" value="Update Graph with Selection" id="submit" onClick={handleUpdateWithSelection}/>
+            <input type="submit" value="Update Graph with Selection" onClick={handleUpdateWithSelection}/>
+            <input type="submit" value="Get Wikipedia Summaries" onClick={handleWikipediaSearch}/>
+            <WikipediaSummaries summaries={summaries}/>
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>
                 <form id="search" action="#" onSubmit={() => setSearch(input)}>
-                    <input type="search" id="search" placeholder="Article title" onChange={(e) => setInput(e.target.value)}/>
-                    <input type="submit" value="Submit" id="submit" onClick={() => setSearch(input)}/>
+                    <input type="search" placeholder="Article title" onChange={(e) => setInput(e.target.value)}/>
+                    <input type="submit" value="Submit" onClick={() => setSearch(input)}/>
                 </form>
             </div>
         </div>

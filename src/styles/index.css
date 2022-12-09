@@ -28,6 +28,7 @@ input[type=search] {
 }
 
 input[type=submit] {
+  margin: 5px 5px; 
   padding: 10px 5px;
   background-color: white;
   border: 1px solid lightgray;
@@ -95,4 +96,19 @@ input:focus {
 
 li:not(:last-child) { 
   margin-bottom: 3px;  
+}
+
+/*----------------------------------------------------------------------------*/
+/* 3. wikipedia summaries styling
+/*----------------------------------------------------------------------------*/
+#wikipedia-summaries {
+  margin: 2.5% 10%;
+  padding: 10px 15px;
+  height: 55%;
+  border: 1px solid lightgray ; 
+  overflow: scroll;
+}
+
+.wikipedia-summary {
+  font-size: x-small;
 }
