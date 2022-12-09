@@ -85,7 +85,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     setSelection(selection);
                     var labels = nodes
                         .filter((node: any) => selection ? selection.includes(node.id) : "")
-                        .map(({label}: {label: string}) => {return label});
+                        .map(({label}: {label: any}) => {return label});
                     setSelectionLabels(labels);
                 }
             });
