@@ -1,5 +1,5 @@
 import { ForwardedRef, forwardRef, useEffect, useState } from "react";
-import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
+import NeoVis, { NeovisConfig, NeoVisEvents, Node } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
 
 export type IdType = string | number;
@@ -16,8 +16,9 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     const {  containerId, serverDatabase, serverURI, serverUser, serverPassword, } = props;
     // keep vis object in state
     const [vis, updateVis] = useState<NeoVis|null>(null);
-	// keep track of selected nodes 
+	// keep track of selected nodes and labels
 	const [selection, setSelection] = useState<IdType[]|undefined>();
+	const [selectionLabels, setSelectionLabels] = useState([""]);
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
@@ -77,9 +78,21 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
             vis.network?.on("select", (e) => {
-                console.log(e);
-                console.log("select");
-                setSelection(vis.network?.getSelectedNodes());
+                // console.log(vis?.network?.getSelectedNodes().map((id) => vis.network?.findNode(id)));
+                var selection = vis.network?.getSelectedNodes();
+                var nodes = vis.nodes.get();
+                if (selection) {
+                    setSelection(selection);
+                    var labels = nodes
+                        .filter((node: any) => selection ? selection.includes(node.id) : "")
+                        .map(({label}: {label: string}) => {return label});
+                    console.log(labels)
+                    setSelectionLabels(labels);
+                console.log("labels: ", selectionLabels)
+                }
+                console.log("selection: ", selection)
+                // console.log("labels: ", selectionLabels)
+                // setSelection(vis.network?.getSelectedNodes());
             });
 
             vis.network?.on("doubleClick", (e) => {
@@ -92,11 +105,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
     const handleUpdateWithSelection = () => {
-        if (selection){
+        if (selection) {
             var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("'+selection+'", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT '+10*selection.length;
             vis?.renderWithCypher(cypher);
-            console.log(vis?.network?.getSelectedNodes());
-            setSelection([""]);
+            setSelection([""]); // reset selection state once graph is re-rendered
         }
     };
 
@@ -129,16 +141,14 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     border: `1px solid lightgray`, 
                     backgroundColor: `#fffff8`,
                 }}
-                // onClick={handleClick}
             />
             <input type="submit" value="Stabilize" id="stabilize" onClick={() => vis?.stabilize()}/>
             <input type="submit" value="Center" id="center" onClick={() => vis?.network?.fit()}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">
-            <SelectedNodes selection={selection}/>
-            <br/>
-            <input type="submit" value="Generate with Selection" id="submit" onClick={handleUpdateWithSelection}/>
+            <SelectedNodes selectionLabels={selectionLabels}/>
+            <input type="submit" value="Update Graph with Selection" id="submit" onClick={handleUpdateWithSelection}/>
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>
                 <form id="search" action="#" onSubmit={() => setSearch(input)}>
