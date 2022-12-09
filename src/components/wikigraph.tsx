@@ -1,5 +1,5 @@
 import { ForwardedRef, forwardRef, useEffect, useState } from "react";
-import NeoVis, { NeovisConfig, NeoVisEvents, Node } from "neovis.js/dist/neovis.js";
+import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
 
 export type IdType = string | number;
@@ -62,7 +62,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         gravitationalConstant: -15000,
                         damping: 0.5
                     }, 
-                    maxVelocity: 15,
+                    maxVelocity: 5,
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click 
                 layout: { randomSeed: 47, },
@@ -77,8 +77,8 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         updateVis(vis);
 
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
+            // listener for "select"
             vis.network?.on("select", (e) => {
-                // console.log(vis?.network?.getSelectedNodes().map((id) => vis.network?.findNode(id)));
                 var selection = vis.network?.getSelectedNodes();
                 var nodes = vis.nodes.get();
                 if (selection) {
@@ -86,19 +86,14 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     var labels = nodes
                         .filter((node: any) => selection ? selection.includes(node.id) : "")
                         .map(({label}: {label: string}) => {return label});
-                    console.log(labels)
                     setSelectionLabels(labels);
-                console.log("labels: ", selectionLabels)
                 }
-                console.log("selection: ", selection)
-                // console.log("labels: ", selectionLabels)
-                // setSelection(vis.network?.getSelectedNodes());
             });
 
+            // listener for "double click"
             vis.network?.on("doubleClick", (e) => {
                 console.log(e);
                 console.log("doubleClicked");
-                // setSelection(vis.network?.getSelectedNodes());
             });
         })
 
@@ -108,7 +103,9 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         if (selection) {
             var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("'+selection+'", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT '+10*selection.length;
             vis?.renderWithCypher(cypher);
-            setSelection([""]); // reset selection state once graph is re-rendered
+            // reset selection state once graph is re-rendered
+            setSelection([""]);
+            setSelectionLabels([""])
         }
     };
 
@@ -142,8 +139,8 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     backgroundColor: `#fffff8`,
                 }}
             />
-            <input type="submit" value="Stabilize" id="stabilize" onClick={() => vis?.stabilize()}/>
-            <input type="submit" value="Center" id="center" onClick={() => vis?.network?.fit()}/>
+            <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
+            <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">

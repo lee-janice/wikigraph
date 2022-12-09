@@ -39,7 +39,7 @@ input:focus {
   outline: 1px solid gray; /* add outline when input fields are clicked */
 }
 
-#stabilize {
+#stabilize-button {
   position: absolute;
   z-index: 10;
   margin: 10px 10px; 
@@ -47,7 +47,7 @@ input:focus {
   left: 0px; 
 }
 
-#center {
+#center-button {
   position: absolute;
   z-index: 10;
   margin: 10px 10px; 
@@ -83,12 +83,16 @@ input:focus {
 /*----------------------------------------------------------------------------*/
 /* 2. selected nodes styling
 /*----------------------------------------------------------------------------*/
-.selected-node-list {
+#selected-node-list {
   text-align: left;
-  margin: 5% 25%;
+  margin: 2.5% 25%;
   padding: 10px 15px;
   border: 1px solid lightgray ; 
   background-color: white;
-  list-style-type: none;
   font-size: small;
+  list-style-type: none;
+}
+
+li:not(:last-child) { 
+  margin-bottom: 3px;  
 }
