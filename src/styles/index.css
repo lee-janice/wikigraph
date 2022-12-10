@@ -16,6 +16,85 @@ code {
     monospace;
 }
 
+hr {
+  border: 0.25px solid lightgray;
+}
+
+li:not(:last-child) { 
+  margin-bottom: 5px;  
+}
+
+
+/*----------------------------------------------------------------------------*/
+/* 1. visualization styling
+/*----------------------------------------------------------------------------*/
+#stabilize-button {
+  position: absolute;
+  z-index: 10;
+  margin: 10px 10px; 
+  bottom: 0px;
+  left: 0px; 
+}
+
+#center-button {
+  position: absolute;
+  z-index: 10;
+  margin: 10px 10px; 
+  bottom: 0px;
+  left: 75px;
+}
+
+/* ----- context menu styles ----- */ 
+.context-menu-list {
+  text-align: left;
+  list-style-type: none;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  z-index: 100; 
+}
+
+.context-menu-item {
+  margin-bottom: 10px;
+}
+
+.context-menu-item:hover {
+  background-color: ghostwhite;
+}
+
+.context-menu-link {
+  border:none;
+  outline:none;
+  text-decoration:none;
+  color:inherit;
+}
+
+/*----------------------------------------------------------------------------*/
+/* 2. sidebar styling 
+/*----------------------------------------------------------------------------*/
+/* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
+.sidebar {
+  height: 100%; 
+  width: 33%;
+  position: fixed; /* stay in place on scroll */
+  z-index: 1; 
+  top: 0; 
+  right: 0;
+  background-color: #fffff8; 
+  overflow-x: hidden; /* disable horizontal scroll */
+  padding-top: 20px;
+  border: 1px solid lightgray;
+}
+
+.search-bar {
+  float: left;
+  margin: 2% 4.5%;
+  width: 95%;
+  position: absolute;
+  bottom: 2%; 
+}
+
 /* ----- input fields ----- */
 input[type=search] {
   margin: 1em;
@@ -40,75 +119,34 @@ input:focus {
   outline: 1px solid gray; /* add outline when input fields are clicked */
 }
 
-#stabilize-button {
-  position: absolute;
-  z-index: 10;
-  margin: 10px 10px; 
-  bottom: 0px;
-  left: 0px; 
-}
-
-#center-button {
-  position: absolute;
-  z-index: 10;
-  margin: 10px 10px; 
-  bottom: 0px;
-  left: 75px;
-}
-
 /*----------------------------------------------------------------------------*/
-/* 1. sidebar styling 
-/*----------------------------------------------------------------------------*/
-/* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
-.sidebar {
-  height: 100%; 
-  width: 33%;
-  position: fixed; /* stay in place on scroll */
-  z-index: 1; 
-  top: 0; 
-  right: 0;
-  background-color: #fffff8; 
-  overflow-x: hidden; /* disable horizontal scroll */
-  padding-top: 20px;
-  border: 1px solid lightgray;
-}
-
-.search-bar {
-  float: left;
-  margin: 2% 4.5%;
-  width: 95%;
-  position: absolute;
-  bottom: 2%; 
-}
-
-/*----------------------------------------------------------------------------*/
-/* 2. selected nodes styling
+/* 3. selected nodes styling
 /*----------------------------------------------------------------------------*/
 #selected-node-list {
   text-align: left;
+  height: 3em; 
   margin: 2.5% 25%;
   padding: 10px 15px;
   border: 1px solid lightgray ; 
   background-color: white;
   font-size: small;
   list-style-type: none;
-}
-
-li:not(:last-child) { 
-  margin-bottom: 3px;  
+  overflow: scroll;
 }
 
 /*----------------------------------------------------------------------------*/
-/* 3. wikipedia summaries styling
+/* 4. wikipedia summaries styling
 /*----------------------------------------------------------------------------*/
 #wikipedia-summaries {
   margin: 2.5% 10%;
   padding: 10px 15px;
-  height: 55%;
+  height: 60%;
   border: 1px solid lightgray ; 
+  background-color: white;
   overflow: scroll;
 }
 
 .wikipedia-summary {
   font-size: x-small;
+  text-align: left;
 }

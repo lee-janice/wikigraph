@@ -1,16 +1,16 @@
 import React from "react";
-import { WikiSummary } from "./wikigraph";
+
+export type WikiSummary = {
+    title: string,
+    text: string,
+    display: boolean
+}
 
 interface Props {
     summaries?: WikiSummary[],
 };
 
 const WikipediaSummaries: React.FC<Props> = ({ summaries }) => {
-    // const zipped: Array<Array<string>> = titles.map((t, i) => {
-    //     return [t, summaries[i]];
-    // });
-    // console.log(titles)
-    // console.log(summaries)
     return (
         <div id="wikipedia-summaries">
             {summaries?.map((item) => {

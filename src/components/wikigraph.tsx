@@ -1,13 +1,11 @@
 import { ForwardedRef, forwardRef, useEffect, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
-import WikipediaSummaries from "./wikipediaSummaries";
+import WikipediaSummaries, { WikiSummary } from "./wikipediaSummaries";
+import ContextMenu, { ContextMenuState } from "./contextMenu";
 
+// TODO: figure out how to import this from vis.js
 export type IdType = string | number;
-export type WikiSummary = {
-    title: string,
-    text: string,
-}
 
 interface Props {
     containerId: string,
@@ -19,18 +17,19 @@ interface Props {
 
 const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const {  containerId, serverDatabase, serverURI, serverUser, serverPassword, } = props;
+    // TODO: put this all into one state object
     // keep vis object in state
     const [vis, updateVis] = useState<NeoVis|null>(null);
 	// keep track of selected nodes and labels
 	const [selection, setSelection] = useState<IdType[]|undefined>();
 	const [selectionLabels, setSelectionLabels] = useState([""]);
     // keep track of summaries 
-    // const [summaries, setSummaries] = useState<string[]>([])
-    // const [summaryTitles, setSummaryTitles] = useState<string[]>([])
     const [summaries, setSummaries] = useState<WikiSummary[]>();
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
+    // keep track of whether the context menu is open or closed
+    const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({open: false, type: "canvas", x: 0, y: 0});
     
     // initialize visualization and neovis object
     useEffect(() => {
@@ -85,6 +84,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         vis.render();
         updateVis(vis);
 
+        // create event listeners once the visualization is rendered
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
             // listener for "select"
             vis.network?.on("select", (e) => {
@@ -99,10 +99,28 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 }
             });
 
+            // listener for "click"j
+            vis.network?.on("click", (e) => {
+                setContextMenuState({open: false, type: "canvas", x: 0, y: 0});
+            });
+
             // listener for "double click"
             vis.network?.on("doubleClick", (e) => {
                 console.log(e);
                 console.log("doubleClicked");
+            });
+
+            // listener for "right click"
+            vis.network?.on("oncontext", (click) => {
+                click.event.preventDefault();
+
+                var rect = click.event.target.getBoundingClientRect();
+                let correctedX = click.event.x - rect.x; 
+                let correctedY = click.event.y - rect.y;
+
+                var node = vis.network?.getNodeAt({x: correctedX, y: correctedY});
+                var type = node ? "node" : "canvas";
+                setContextMenuState({open: true, type: type, x: correctedX, y: correctedY});
             });
         })
 
@@ -151,7 +169,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             const json = await response.json();
             // setSummaryTitles([...summaryTitles, title]);
             // setSummaries([...summaries, json.query.pages[pageid].extract]);
-            console.log(json);
             return json.query.pages[pageid].extract;
         };
 
@@ -164,6 +181,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             summaries.push({
                 title: result.title,
                 text: await getWikipediaExtract(result.pageid),
+                display: true,
             })
             // titles.push(result.title);
             // extracts.push(await getWikipediaExtract(result.pageid));
@@ -180,6 +198,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         // setSummaryTitles(selectionLabels);
         // console.log(extract);
         // }
+    }
+
+    const handleLoadSummary = () => {
+        
     }
 
     // execute cypher query when user inputs search, update visualization
@@ -201,7 +223,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     return (
         <div>
         {/* graph visualization */}
-        <div style={{ height: `80%`, width: `60%`, position: `fixed`, }}>
+        <div id="canvas" style={{ height: `80%`, width: `60%`, position: `fixed`, }}>
             <div id={containerId} 
                 ref={ref}
                 style={{ 
@@ -209,11 +231,13 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     width: `100%`,
                     height: `100%`,
                     border: `1px solid lightgray`, 
-                    backgroundColor: `#fffff8`,
+                    // backgroundColor: `#fffff8`,
+                    backgroundColor: `white`,
                 }}
             />
             <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
             <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()}/>
+            <ContextMenu state={contextMenuState}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">
