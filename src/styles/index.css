@@ -24,6 +24,29 @@ li:not(:last-child) {
   margin-bottom: 5px;  
 }
 
+/* ----- input fields ----- */
+input[type=search] {
+  margin: 1em;
+  padding: 10px 15px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  height: 36px;
+  width: 66%;
+  -moz-tap-highlight-color: rgba(0,0,0,0.15);
+}
+
+input[type=submit] {
+  margin: 5px 5px; 
+  padding: 10px 5px;
+  background-color: white;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input:focus {
+  outline: 1px solid gray; /* add outline when input fields are clicked */
+}
 
 /*----------------------------------------------------------------------------*/
 /* 1. visualization styling
@@ -87,41 +110,7 @@ li:not(:last-child) {
   border: 1px solid lightgray;
 }
 
-.search-bar {
-  float: left;
-  margin: 2% 4.5%;
-  width: 95%;
-  position: absolute;
-  bottom: 2%; 
-}
-
-/* ----- input fields ----- */
-input[type=search] {
-  margin: 1em;
-  padding: 10px 15px;
-  border: 1px solid lightgray;
-  border-radius: 5px;
-  height: 36px;
-  width: 66%;
-  -moz-tap-highlight-color: rgba(0,0,0,0.15);
-}
-
-input[type=submit] {
-  margin: 5px 5px; 
-  padding: 10px 5px;
-  background-color: white;
-  border: 1px solid lightgray;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-input:focus {
-  outline: 1px solid gray; /* add outline when input fields are clicked */
-}
-
-/*----------------------------------------------------------------------------*/
-/* 3. selected nodes styling
-/*----------------------------------------------------------------------------*/
+/* ----- selected nodes ----- */ 
 #selected-node-list {
   text-align: left;
   height: 3em; 
@@ -134,19 +123,26 @@ input:focus {
   overflow: scroll;
 }
 
-/*----------------------------------------------------------------------------*/
-/* 4. wikipedia summaries styling
-/*----------------------------------------------------------------------------*/
+/* ----- wikipedia summaries ----- */
 #wikipedia-summaries {
   margin: 2.5% 10%;
   padding: 10px 15px;
   height: 60%;
   border: 1px solid lightgray ; 
-  background-color: white;
+  /* background-color: white; */
   overflow: scroll;
 }
 
 .wikipedia-summary {
   font-size: x-small;
   text-align: left;
+}
+
+/* ----- search bar ----- */
+.search-bar {
+  float: left;
+  margin: 2% 4.5%;
+  width: 95%;
+  position: absolute;
+  bottom: 2%; 
 }

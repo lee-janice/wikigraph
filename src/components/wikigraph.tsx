@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef, useEffect, useState } from "react";
+import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
 import WikipediaSummaries, { WikiSummary } from "./wikipediaSummaries";
@@ -30,6 +30,9 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 	const [search, setSearch] = useState("Universe");
     // keep track of whether the context menu is open or closed
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({open: false, type: "canvas", x: 0, y: 0});
+
+    // get reference to selection so that we can use the current value in the vis event listeners
+    const selectionRef = useRef(selection); 
     
     // initialize visualization and neovis object
     useEffect(() => {
@@ -91,7 +94,11 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 var selection = vis.network?.getSelectedNodes();
                 var nodes = vis.nodes.get();
                 if (selection) {
+                    // update selection
                     setSelection(selection);
+                    selectionRef.current = selection;
+
+                    // update selection labels
                     var labels = nodes
                         .filter((node: any) => selection ? selection.includes(node.id) : "")
                         .map(({label}: {label?: any}) => {return label});
@@ -99,7 +106,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 }
             });
 
-            // listener for "click"j
+            // listener for "click"
             vis.network?.on("click", (e) => {
                 setContextMenuState({open: false, type: "canvas", x: 0, y: 0});
             });
@@ -114,15 +121,21 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             vis.network?.on("oncontext", (click) => {
                 click.event.preventDefault();
 
+                // get adjusted coordinates to place the context menu
                 var rect = click.event.target.getBoundingClientRect();
                 let correctedX = click.event.x - rect.x; 
                 let correctedY = click.event.y - rect.y;
 
-                var node = vis.network?.getNodeAt({x: correctedX, y: correctedY});
-                var type = node ? "node" : "canvas";
+                // set context menu state based on context
+                if (selectionRef.current && selectionRef.current.length > 1) {
+                    var type = "selection";
+                } else {
+                    var node = vis.network?.getNodeAt({x: correctedX, y: correctedY});
+                    var type = node ? "node" : "canvas";
+                };
                 setContextMenuState({open: true, type: type, x: correctedX, y: correctedY});
             });
-        })
+        });
 
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
@@ -130,9 +143,11 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         if (selection) {
             var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("'+selection+'", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT '+10*selection.length;
             vis?.renderWithCypher(cypher);
-            // reset selection state once graph is re-rendered
-            setSelection([""]);
-            setSelectionLabels([""]);
+            // de-select old nodes once new vis is rendered
+            vis?.network?.setSelection({nodes: [], edges: []});
+            // reset selection state once new vis is re-rendered
+            setSelection([]);
+            setSelectionLabels([]);
         }
     };
 
@@ -231,8 +246,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     width: `100%`,
                     height: `100%`,
                     border: `1px solid lightgray`, 
-                    // backgroundColor: `#fffff8`,
-                    backgroundColor: `white`,
+                    backgroundColor: `#fffff8`,
                 }}
             />
             <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
