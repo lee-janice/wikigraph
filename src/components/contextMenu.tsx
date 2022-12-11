@@ -27,16 +27,17 @@ const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNo
 
     switch (state.type) {
         case "node": 
+            // TODO: change message based on number of nodes selected
             return (
                 <div 
                     className="context-menu" 
                     id="context-menu"
                     style={style}>
                     <ul className="context-menu-list">
-                        <li className="context-menu-item" onClick={handleLoadSummary}><a className="context-menu-link" href="#">Load summary from Wikipedia →</a></li>
-                        <li className="context-menu-item" onClick={handleDeleteNode}><a className="context-menu-link" href="#">Delete node(s)</a></li>
+                        <li className="context-menu-item" onClick={handleLoadSummary}>Load summary/ies from Wikipedia →</li>
+                        <li className="context-menu-item" onClick={handleDeleteNode}>Delete node(s)</li>
                         <hr/>
-                        <li className="context-menu-item"><a className="context-menu-link" href="#">Go to Wikipedia page(s) ↗</a></li>
+                        <li className="context-menu-item">Go to Wikipedia page(s) ↗</li>
                     </ul>
                 </div>
             );
@@ -47,7 +48,7 @@ const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNo
                     id="context-menu"
                     style={style}>
                     <ul className="context-menu-list">
-                        <li className="context-menu-item"><a className="context-menu-link" href="#">Open image in new tab</a></li>
+                        <li className="context-menu-item">Open image in new tab</li>
                     </ul>
                 </div>
             );

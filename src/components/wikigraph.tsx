@@ -139,7 +139,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     const nodeIds = vis.network?.getSelectedNodes();
                     if (nodeIds) { updateSelectionState(nodeIds); }
                 } else {
-                    var type = "canvas";
+                    type = "canvas";
                 }
 
                 setContextMenuState({open: true, type: type, x: correctedX, y: correctedY});

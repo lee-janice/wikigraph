@@ -80,6 +80,7 @@ input:focus {
 
 .context-menu-item {
   margin-bottom: 10px;
+  cursor: pointer;
 }
 
 .context-menu-item:hover {
