@@ -127,20 +127,23 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 let correctedX = click.event.x - rect.x; 
                 let correctedY = click.event.y - rect.y;
 
+                var type = "";
                 // check if there's a node under the cursor
                 var nodeId = vis.network?.getNodeAt({x: correctedX, y: correctedY});
                 if (nodeId) {
-                    var type = "node";
                     // select node that was right-clicked
                     if (selectionRef.current) { vis.network?.selectNodes([...selectionRef.current, nodeId]); }
                     else { vis.network?.selectNodes([nodeId]); };
 
                     // update selection state
                     const nodeIds = vis.network?.getSelectedNodes();
-                    if (nodeIds) { updateSelectionState(nodeIds); }
+                    if (nodeIds) { 
+                        updateSelectionState(nodeIds); 
+                        nodeIds.length > 1 ? type = "nodes" : type = "node";
+                    };
                 } else {
                     type = "canvas";
-                }
+                };
 
                 setContextMenuState({open: true, type: type, x: correctedX, y: correctedY});
             });
@@ -204,7 +207,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     height: `100%`,
                     border: `1px solid lightgray`, 
                     backgroundColor: `white`,
-                    // backgroundColor: `#fffff8`,
                 }}
             />
             <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
@@ -215,7 +217,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         <div className="sidebar">
             <SelectedNodes selectionLabels={selectionLabels}/>
             <input type="submit" value="Update Graph with Selection" onClick={handleUpdateWithSelection}/>
-            {/* <input type="submit" value="Get Wikipedia Summaries" onClick={handleWikipediaSearch}/> */}
             <WikipediaSummaries summaries={summaries}/>
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>
