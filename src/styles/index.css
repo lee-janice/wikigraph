@@ -129,7 +129,7 @@ input:focus {
   padding: 10px 15px;
   height: 60%;
   border: 1px solid lightgray ; 
-  /* background-color: white; */
+  background-color: white;
   overflow: scroll;
 }
 

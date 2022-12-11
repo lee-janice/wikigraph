@@ -1,7 +1,7 @@
 import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
-import WikipediaSummaries, { WikiSummary } from "./wikipediaSummaries";
+import WikipediaSummaries, { getWikipediaExtract, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
 import ContextMenu, { ContextMenuState } from "./contextMenu";
 
 // TODO: figure out how to import this from vis.js
@@ -33,7 +33,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
     // get reference to selection so that we can use the current value in the vis event listeners
     const selectionRef = useRef(selection); 
-    
+
     // initialize visualization and neovis object
     useEffect(() => {
         var config: NeovisConfig = {
@@ -89,21 +89,22 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
         // create event listeners once the visualization is rendered
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
+            const updateSelectionState = (nodeIds: IdType[]) => {
+                // update selection
+                setSelection(nodeIds);
+                selectionRef.current = nodeIds;
+
+                // update selection labels
+                var labels = vis.nodes.get()
+                    .filter((node: any) => nodeIds ? nodeIds.includes(node.id) : "")
+                    .map(({label}: {label?: any}) => {return label});
+                setSelectionLabels(labels);
+            };
+
             // listener for "select"
             vis.network?.on("select", (e) => {
-                var selection = vis.network?.getSelectedNodes();
-                var nodes = vis.nodes.get();
-                if (selection) {
-                    // update selection
-                    setSelection(selection);
-                    selectionRef.current = selection;
-
-                    // update selection labels
-                    var labels = nodes
-                        .filter((node: any) => selection ? selection.includes(node.id) : "")
-                        .map(({label}: {label?: any}) => {return label});
-                    setSelectionLabels(labels);
-                }
+                var nodeIds = vis.network?.getSelectedNodes();
+                if (nodeIds) { updateSelectionState(nodeIds); }
             });
 
             // listener for "click"
@@ -126,13 +127,21 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 let correctedX = click.event.x - rect.x; 
                 let correctedY = click.event.y - rect.y;
 
-                // set context menu state based on context
-                if (selectionRef.current && selectionRef.current.length > 1) {
-                    var type = "selection";
+                // check if there's a node under the cursor
+                var nodeId = vis.network?.getNodeAt({x: correctedX, y: correctedY});
+                if (nodeId) {
+                    var type = "node";
+                    // select node that was right-clicked
+                    if (selectionRef.current) { vis.network?.selectNodes([...selectionRef.current, nodeId]); }
+                    else { vis.network?.selectNodes([nodeId]); };
+
+                    // update selection state
+                    const nodeIds = vis.network?.getSelectedNodes();
+                    if (nodeIds) { updateSelectionState(nodeIds); }
                 } else {
-                    var node = vis.network?.getNodeAt({x: correctedX, y: correctedY});
-                    var type = node ? "node" : "canvas";
-                };
+                    var type = "canvas";
+                }
+
                 setContextMenuState({open: true, type: type, x: correctedX, y: correctedY});
             });
         });
@@ -151,73 +160,21 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         }
     };
 
-    const handleWikipediaSearch = async () => {
-        async function searchWikipedia(searchQuery: string): Promise<{title: string, pageid: string}> {
-            const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&origin=*`;
-
-            const response = await fetch(endpoint);
-            // if request failed, throw an error
-            if (!response.ok) {
-              throw Error(response.statusText);
-            }
-
-            const json = await response.json();
-            // if no search results returned, throw an error 
-            if (json.query.search.length === 0) {
-                throw Error(`No Wikipedia articles for ${searchQuery} were found.`);
-            }
-
-            // return the Page ID of the best match
-            const bestMatch = json.query.search[0];
-            return {title: bestMatch.title, pageid: bestMatch.pageid.toString()} ;
-        };
-
-        async function getWikipediaExtract(pageid: string) {
-            const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro&explaintext&pageids=${pageid}&origin=*`;
-
-            const response = await fetch(endpoint);
-            // if request failed, throw an error
-            if (!response.ok) {
-              throw Error(response.statusText);
-            }
-
-            const json = await response.json();
-            // setSummaryTitles([...summaryTitles, title]);
-            // setSummaries([...summaries, json.query.pages[pageid].extract]);
-            return json.query.pages[pageid].extract;
-        };
-
-        // if (selectionLabels) {
+    const handleLoadSummary = async () => {
         var summaries: Array<WikiSummary> = [];
-        // var extracts: Array<string> = [];
-        // console.log(selectionLabels);
-        selectionLabels.map(async (label) => {
+        await Promise.all(selectionLabels.map(async (label) => {
             const result = await searchWikipedia(label); 
             summaries.push({
                 title: result.title,
                 text: await getWikipediaExtract(result.pageid),
                 display: true,
             })
-            // titles.push(result.title);
-            // extracts.push(await getWikipediaExtract(result.pageid));
-            // const extract = await getWikipediaExtract(await searchWikipedia(label));
-            // extracts.push(extract);
-            // await getWikipediaExtract(await searchWikipedia(label));
-        });
-
-        // setSummaryTitles(titles);
+        }));
         setSummaries(summaries);
         console.log(summaries);
+    };
 
-        // setSummaries(extracts);
-        // setSummaryTitles(selectionLabels);
-        // console.log(extract);
-        // }
-    }
-
-    const handleLoadSummary = () => {
-        
-    }
+    const handleDeleteNode = () => { };
 
     // execute cypher query when user inputs search, update visualization
 	useEffect(() => {
@@ -246,18 +203,19 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     width: `100%`,
                     height: `100%`,
                     border: `1px solid lightgray`, 
-                    backgroundColor: `#fffff8`,
+                    backgroundColor: `white`,
+                    // backgroundColor: `#fffff8`,
                 }}
             />
             <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
             <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()}/>
-            <ContextMenu state={contextMenuState}/>
+            <ContextMenu state={contextMenuState} handleLoadSummary={handleLoadSummary} handleDeleteNode={handleDeleteNode}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">
             <SelectedNodes selectionLabels={selectionLabels}/>
             <input type="submit" value="Update Graph with Selection" onClick={handleUpdateWithSelection}/>
-            <input type="submit" value="Get Wikipedia Summaries" onClick={handleWikipediaSearch}/>
+            {/* <input type="submit" value="Get Wikipedia Summaries" onClick={handleWikipediaSearch}/> */}
             <WikipediaSummaries summaries={summaries}/>
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>

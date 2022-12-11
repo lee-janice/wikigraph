@@ -4,20 +4,19 @@ export type ContextMenuState = {
     open: boolean,
     type: string,
     x: number,
-    y: number
+    y: number,
 }
 
 interface Props {
     state: ContextMenuState,
+    handleLoadSummary: () => void,
+    handleDeleteNode: () => void,
 };
 
-const ContextMenu: React.FC<Props> = ({ state }) => {
-    const handleLoadSummary = () => {
-
-    };
-
+const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNode }) => {
     const style = !state.open ? {display: `none`} : {
-        position: `absolute` as `absolute`, // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
+        // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
+        position: `absolute` as `absolute`, 
         left: state.x, 
         top: state.y,
         border: `1px solid lightgray`,
@@ -34,24 +33,10 @@ const ContextMenu: React.FC<Props> = ({ state }) => {
                     id="context-menu"
                     style={style}>
                     <ul className="context-menu-list">
-                        <li className="context-menu-item" onClick={() => console.log("hi")}><a className="context-menu-link" href="#">Load summary from Wikipedia →</a></li>
-                        <li className="context-menu-item" onClick={() => console.log("delete")}><a className="context-menu-link" href="#">Delete node</a></li>
+                        <li className="context-menu-item" onClick={handleLoadSummary}><a className="context-menu-link" href="#">Load summary from Wikipedia →</a></li>
+                        <li className="context-menu-item" onClick={handleDeleteNode}><a className="context-menu-link" href="#">Delete node(s)</a></li>
                         <hr/>
-                        <li className="context-menu-item"><a className="context-menu-link" href="#">Go to Wikipedia page ↗</a></li>
-                    </ul>
-                </div>
-            );
-        case "selection": 
-            return (
-                <div 
-                    className="context-menu" 
-                    id="context-menu"
-                    style={style}>
-                    <ul className="context-menu-list">
-                        <li className="context-menu-item" onClick={() => console.log("hi")}><a className="context-menu-link" href="#">Load summaries from Wikipedia →</a></li>
-                        <li className="context-menu-item" onClick={() => console.log("delete")}><a className="context-menu-link" href="#">Delete nodes</a></li>
-                        <hr/>
-                        <li className="context-menu-item"><a className="context-menu-link" href="#">Open Wikipedia pages ↗</a></li>
+                        <li className="context-menu-item"><a className="context-menu-link" href="#">Go to Wikipedia page(s) ↗</a></li>
                     </ul>
                 </div>
             );
