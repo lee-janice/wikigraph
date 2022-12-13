@@ -1,7 +1,7 @@
 import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
-import WikipediaSummaries, { getWikipediaExtract, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
+import WikipediaSummaries, { getWikipediaExtract, getWikipediaLink, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
 import ContextMenu, { ContextMenuState } from "./contextMenu";
 
 // TODO: figure out how to import this from vis.js
@@ -151,6 +151,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
+    // event handler for "Update Graph with Selection" button press
     const handleUpdateWithSelection = () => {
         if (selection) {
             var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("'+selection+'", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT '+10*selection.length;
@@ -163,6 +164,8 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         }
     };
 
+    // TODO: maybe should move these into the context menu component, and pass the selectionLabels state variable instead of the event handlers
+    // event handler for "Load summaries from Wikipedia" context menu selection
     const handleLoadSummary = async () => {
         var summaries: Array<WikiSummary> = [];
         await Promise.all(selectionLabels.map(async (label) => {
@@ -171,14 +174,23 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 title: result.title,
                 text: await getWikipediaExtract(result.pageid),
                 display: true,
-            })
+            });
         }));
         setSummaries(summaries);
         console.log(summaries);
     };
 
+    // event handler for "Delete nodes" context menu selection
     const handleDeleteNode = () => { 
         vis?.network?.deleteSelected();
+    };
+
+    // event handler for "Launch Wikipedia page" context menu selection
+    const handleLaunchWikipediaPage = async () => { 
+        await Promise.all(selectionLabels.map(async (label) => {
+            const result = await searchWikipedia(label); 
+            window.open(await getWikipediaLink(result.pageid), '_blank');
+        }));
     };
 
     // execute cypher query when user inputs search, update visualization
@@ -213,7 +225,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             />
             <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
             <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()}/>
-            <ContextMenu state={contextMenuState} handleLoadSummary={handleLoadSummary} handleDeleteNode={handleDeleteNode}/>
+            <ContextMenu state={contextMenuState} 
+                handleLoadSummary={handleLoadSummary} 
+                handleDeleteNode={handleDeleteNode} 
+                handleLaunchWikipediaPage={handleLaunchWikipediaPage}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">

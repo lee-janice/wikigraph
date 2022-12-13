@@ -10,6 +10,7 @@ interface Props {
     summaries?: WikiSummary[],
 };
 
+// Wikipedia API functions—probably should put into its own file
 export async function searchWikipedia(searchQuery: string): Promise<{title: string, pageid: string}> {
     const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&origin=*`;
 
@@ -40,6 +41,18 @@ export async function getWikipediaExtract(pageid: string) {
     }
     const json = await response.json();
     return json.query.pages[pageid].extract;
+};
+
+export async function getWikipediaLink(pageid: string) {
+    const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=info&inprop=url&pageids=${pageid}&origin=*`;
+
+    const response = await fetch(endpoint);
+    // if request failed, throw an error
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    const json = await response.json();
+    return json.query.pages[pageid].fullurl;
 };
 
 

@@ -11,9 +11,10 @@ interface Props {
     state: ContextMenuState,
     handleLoadSummary: () => void,
     handleDeleteNode: () => void,
+    handleLaunchWikipediaPage: () => void,
 };
 
-const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNode }) => {
+const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNode, handleLaunchWikipediaPage }) => {
     const style = !state.open ? {display: `none`} : {
         // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
         position: `absolute` as `absolute`, 
@@ -36,7 +37,7 @@ const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNo
                         <li className="context-menu-item" onClick={handleLoadSummary}>Load summary from Wikipedia →</li>
                         <li className="context-menu-item" onClick={handleDeleteNode}>Delete node</li>
                         <hr/>
-                        <li className="context-menu-item">Launch Wikipedia page ↗</li>
+                        <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>Launch Wikipedia page ↗</li>
                     </ul>
                 </div>
             );
@@ -50,7 +51,7 @@ const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNo
                         <li className="context-menu-item" onClick={handleLoadSummary}>Load summaries from Wikipedia →</li>
                         <li className="context-menu-item" onClick={handleDeleteNode}>Delete nodes</li>
                         <hr/>
-                        <li className="context-menu-item">Launch Wikipedia pages ↗</li>
+                        <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>Launch Wikipedia pages ↗</li>
                     </ul>
                 </div>
             );
