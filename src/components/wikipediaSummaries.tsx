@@ -18,8 +18,8 @@ export async function searchWikipedia(searchQuery: string): Promise<{title: stri
     if (!response.ok) {
         throw Error(response.statusText);
     }
-
     const json = await response.json();
+
     // if no search results returned, throw an error 
     if (json.query.search.length === 0) {
         throw Error(`No Wikipedia articles for ${searchQuery} were found.`);
@@ -38,7 +38,6 @@ export async function getWikipediaExtract(pageid: string) {
     if (!response.ok) {
         throw Error(response.statusText);
     }
-
     const json = await response.json();
     return json.query.pages[pageid].extract;
 };

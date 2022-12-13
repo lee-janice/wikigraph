@@ -177,7 +177,9 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         console.log(summaries);
     };
 
-    const handleDeleteNode = () => { };
+    const handleDeleteNode = () => { 
+        vis?.network?.deleteSelected();
+    };
 
     // execute cypher query when user inputs search, update visualization
 	useEffect(() => {
