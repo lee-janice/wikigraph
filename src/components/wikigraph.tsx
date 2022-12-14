@@ -196,10 +196,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     // execute cypher query when user inputs search, update visualization
 	useEffect(() => {
         // TODO: replace this with something that does not open the DB up to an injection attack
-		var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toLower(p1.title) = toLower("'+search+'") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10';
-
-        // TODO: replace with fuzzy match, only return the closest match to the string
-        // var cypher = "MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page) WHERE apoc.text.fuzzyMatch(p1.title, '"+article+"') RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10"
+        var cypher = 'CALL { MATCH (p:Page) WHERE apoc.text.levenshteinSimilarity(p.title, "'+search+'") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "'+search+'") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page) WHERE p1.title = title RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10';
 
         // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
         if (cypher.length > 0) {
