@@ -42,7 +42,9 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, 
                     text: await getWikipediaExtract(result.pageid),
                 };
                 // if it is the first summary generated so far, set it to the current summary
-                if (s.length === 0) {setCurrentSummary(summary)};
+                if (s.length === 0) {
+                    setCurrentSummary(summary);
+                };
                 s.push(summary);
             }
         }));

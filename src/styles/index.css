@@ -172,6 +172,15 @@ input:focus {
   background-color: white; 
 }
 
+.close-tab {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin: 0 2px 0 7px;
+  text-align: center;
+}
+
+
 
 /* ----- search bar ----- */
 .search-bar {

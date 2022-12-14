@@ -19,7 +19,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     const {  containerId, serverDatabase, serverURI, serverUser, serverPassword, } = props;
     // TODO: put this all into one state object
     // keep vis object in state
-    const [vis, updateVis] = useState<NeoVis|null>(null);
+    const [vis, setVis] = useState<NeoVis|null>(null);
 	// keep track of selected nodes and labels
 	const [selection, setSelection] = useState<IdType[]>([]);
 	const [selectionLabels, setSelectionLabels] = useState([""]);
@@ -87,7 +87,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         };
         const vis: NeoVis = new NeoVis(config);
         vis.render();
-        updateVis(vis);
+        setVis(vis);
 
         // create event listeners once the visualization is rendered
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
@@ -202,13 +202,19 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 selectionLabels={selectionLabels}
                 summaries={summaries}
                 setSummaries={setSummaries}
-                setCurrentSummary={setCurrentSummary}/>
+                setCurrentSummary={setCurrentSummary}
+            />
         </div>
         {/* sidebar */}
         <div className="sidebar">
             <SelectedNodes selectionLabels={selectionLabels}/>
             <input type="submit" value="Update Graph with Selection" onClick={handleUpdateWithSelection}/>
-            <WikipediaSummaries summaries={summaries} currentSummary={currentSummary} setCurrentSummary={setCurrentSummary}/>
+            <WikipediaSummaries  
+                summaries={summaries} 
+                setSummaries={setSummaries}
+                currentSummary={currentSummary} 
+                setCurrentSummary={setCurrentSummary} 
+            />
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>
                 <form id="search" action="#" onSubmit={() => setSearch(input)}>
