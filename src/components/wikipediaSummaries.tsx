@@ -1,13 +1,14 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 export type WikiSummary = {
     title: string,
     text: string,
-    display: boolean
 }
 
 interface Props {
-    summaries?: WikiSummary[],
+    summaries: WikiSummary[],
+    currentSummary: WikiSummary | null
+    setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>,
 };
 
 // Wikipedia API functions
@@ -56,22 +57,33 @@ export async function getWikipediaLink(pageid: string) {
     return json.query.pages[pageid].fullurl;
 };
 
-
-const WikipediaSummaries: React.FC<Props> = ({ summaries }) => {
-    return (
-        <div id="wikipedia-summaries">
-            {summaries?.map((item) => {
-                const title = item.title;
-                const summary = item.text;
-                return (
-                    <div key={title}>
-                        {title}<br/>
-                        <p className="wikipedia-summary">{summary}</p>
-                    </div>
-                );
-            })}
-        </div>
-    );
+const WikipediaSummaries: React.FC<Props> = ({ summaries, currentSummary, setCurrentSummary}) => {
+    
+    if (currentSummary) {
+        return (
+            <div id="wikipedia-summaries">
+                <div id="wikipedia-summary-tabs"> 
+                    {summaries?.map((summary) => {
+                        return <div 
+                            className={`wikipedia-summary-tab ${summary===currentSummary ? 'tab-selected' : ''}`}
+                            key={summary.title} 
+                            onClick={() => {setCurrentSummary(summary)}}> 
+                                {summary.title} 
+                            </div>
+                    })}
+                </div>
+                {/* <br/> */}
+                {/* <p style={{display: "block"}}></p> */}
+                <div className="wikipedia-summary">
+                    <p style={{fontSize: "large", textAlign: "center", margin: "0px 10px 10px 10px"}}>{currentSummary.title}</p>
+                    {/* <br/> */}
+                    {currentSummary.text}
+                </div>
+            </div>
+        );
+    } else {
+        return <div id="wikipedia-summaries"></div>
+    }
 };
 
 export default WikipediaSummaries;

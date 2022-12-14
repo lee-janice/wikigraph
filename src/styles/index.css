@@ -134,10 +134,35 @@ input:focus {
   overflow: scroll;
 }
 
+.wikipedia-summary-tabs {
+  display: block;
+}
+
+.wikipedia-summary-tab {
+  float: left;
+  margin: 0 8px -1px 0;
+  padding: 5px 5px;
+  border: 1px solid lightgray;
+  background-color: #fffff8; 
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-size: small;
+  text-align: center;
+}
+
 .wikipedia-summary {
+  /* border-top: 1px solid lightgray ;  */
   font-size: x-small;
   text-align: left;
+  display: inline-block;
+  padding-top: 1em;
 }
+
+.tab-selected {
+  border-bottom: none;
+  background-color: white; 
+}
+
 
 /* ----- search bar ----- */
 .search-bar {

@@ -1,7 +1,7 @@
 import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import SelectedNodes from "./selectedNodes";
-import WikipediaSummaries, { getWikipediaExtract, getWikipediaLink, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
+import WikipediaSummaries, { WikiSummary } from "./wikipediaSummaries";
 import ContextMenu, { ContextMenuState } from "./contextMenu";
 
 // TODO: figure out how to import this from vis.js
@@ -25,6 +25,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 	const [selectionLabels, setSelectionLabels] = useState([""]);
     // keep track of summaries 
     const [summaries, setSummaries] = useState<WikiSummary[]>([]);
+    const [currentSummary, setCurrentSummary] = useState<WikiSummary | null>(null);
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
@@ -32,9 +33,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({open: false, type: "canvas", x: 0, y: 0});
 
     // get reference to selection so that we can use the current value in the vis event listeners
+    // otherwise, the value lags behind
     const selectionRef = useRef(selection); 
 
-    // initialize visualization and neovis object
+    // ----- initialize visualization and neovis object -----
     useEffect(() => {
         var config: NeovisConfig = {
             containerId: containerId,
@@ -89,6 +91,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
         // create event listeners once the visualization is rendered
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
+
             const updateSelectionState = (nodeIds: IdType[]) => {
                 // update selection
                 setSelection(nodeIds);
@@ -101,24 +104,24 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 setSelectionLabels(labels);
             };
 
-            // listener for "select"
+            // 1. listener for "select" 
             vis.network?.on("select", (e) => {
                 var nodeIds = vis.network?.getSelectedNodes();
                 if (nodeIds) { updateSelectionState(nodeIds); }
             });
 
-            // listener for "click"
+            // 2. listener for "click" 
             vis.network?.on("click", (e) => {
                 setContextMenuState({open: false, type: "canvas", x: 0, y: 0});
             });
 
-            // listener for "double click"
+            // 3. listener for "double click" 
             vis.network?.on("doubleClick", (e) => {
                 console.log(e);
                 console.log("doubleClicked");
             });
 
-            // listener for "right click"
+            // 4. listener for "right click" 
             vis.network?.on("oncontext", (click) => {
                 click.event.preventDefault();
 
@@ -151,7 +154,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
     }, [ containerId, serverDatabase, serverURI, serverUser, serverPassword ]);
 
-    // event handler for "Update Graph with Selection" button press
+    // ----- event handler for "Update Graph with Selection" button press -----
     const handleUpdateWithSelection = () => {
         if (selection) {
             var cypher = 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("'+selection+'", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT '+10*selection.length;
@@ -164,7 +167,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         }
     };
 
-    // execute cypher query when user inputs search, update visualization
+    // ----- execute cypher query when user inputs search, update visualization -----
 	useEffect(() => {
         // TODO: replace this with something that does not open the DB up to an injection attack
         var cypher = 'CALL { MATCH (p:Page) WHERE apoc.text.levenshteinSimilarity(p.title, "'+search+'") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "'+search+'") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page) WHERE p1.title = title RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10';
@@ -198,13 +201,14 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 vis={vis} 
                 selectionLabels={selectionLabels}
                 summaries={summaries}
-                setSummaries={setSummaries}/>
+                setSummaries={setSummaries}
+                setCurrentSummary={setCurrentSummary}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">
             <SelectedNodes selectionLabels={selectionLabels}/>
             <input type="submit" value="Update Graph with Selection" onClick={handleUpdateWithSelection}/>
-            <WikipediaSummaries summaries={summaries}/>
+            <WikipediaSummaries summaries={summaries} currentSummary={currentSummary} setCurrentSummary={setCurrentSummary}/>
             <div className="search-bar">
                 Search for a Wikipedia article:<br/>
                 <form id="search" action="#" onSubmit={() => setSearch(input)}>
