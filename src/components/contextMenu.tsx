@@ -1,4 +1,6 @@
-import React from "react";
+import NeoVis from "neovis.js";
+import React, { Dispatch, SetStateAction } from "react";
+import { getWikipediaExtract, getWikipediaLink, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
 
 export type ContextMenuState = {
     open: boolean,
@@ -9,12 +11,13 @@ export type ContextMenuState = {
 
 interface Props {
     state: ContextMenuState,
-    handleLoadSummary: () => void,
-    handleDeleteNode: () => void,
-    handleLaunchWikipediaPage: () => void,
+    vis?: NeoVis|null,
+    selectionLabels: string[],
+    setSummaries: Dispatch<SetStateAction<WikiSummary[] | undefined>>,
 };
 
-const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNode, handleLaunchWikipediaPage }) => {
+// const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNode, handleLaunchWikipediaPage }) => {
+const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, setSummaries }) => {
     const style = !state.open ? {display: `none`} : {
         // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
         position: `absolute` as `absolute`, 
@@ -25,6 +28,34 @@ const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNo
         borderRadius: `5px`,
         backgroundColor: `white`,
     }
+
+    // event handler for "Load summaries from Wikipedia" context menu selection
+    const handleLoadSummary = async () => {
+        var summaries: Array<WikiSummary> = [];
+        await Promise.all(selectionLabels.map(async (label) => {
+            const result = await searchWikipedia(label); 
+            summaries.push({
+                title: result.title,
+                text: await getWikipediaExtract(result.pageid),
+                display: true,
+            });
+        }));
+        setSummaries(summaries);
+        // console.log(summaries);
+    };
+
+    // event handler for "Delete nodes" context menu selection
+    const handleDeleteNode = () => { 
+        vis?.network?.deleteSelected();
+    };
+
+    // event handler for "Launch Wikipedia page" context menu selection
+    const handleLaunchWikipediaPage = async () => { 
+        await Promise.all(selectionLabels.map(async (label) => {
+            const result = await searchWikipedia(label); 
+            window.open(await getWikipediaLink(result.pageid), '_blank');
+        }));
+    };
 
     switch (state.type) {
         case "node": 

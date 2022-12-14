@@ -164,35 +164,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         }
     };
 
-    // TODO: maybe should move these into the context menu component, and pass the selectionLabels state variable instead of the event handlers
-    // event handler for "Load summaries from Wikipedia" context menu selection
-    const handleLoadSummary = async () => {
-        var summaries: Array<WikiSummary> = [];
-        await Promise.all(selectionLabels.map(async (label) => {
-            const result = await searchWikipedia(label); 
-            summaries.push({
-                title: result.title,
-                text: await getWikipediaExtract(result.pageid),
-                display: true,
-            });
-        }));
-        setSummaries(summaries);
-        console.log(summaries);
-    };
-
-    // event handler for "Delete nodes" context menu selection
-    const handleDeleteNode = () => { 
-        vis?.network?.deleteSelected();
-    };
-
-    // event handler for "Launch Wikipedia page" context menu selection
-    const handleLaunchWikipediaPage = async () => { 
-        await Promise.all(selectionLabels.map(async (label) => {
-            const result = await searchWikipedia(label); 
-            window.open(await getWikipediaLink(result.pageid), '_blank');
-        }));
-    };
-
     // execute cypher query when user inputs search, update visualization
 	useEffect(() => {
         // TODO: replace this with something that does not open the DB up to an injection attack
@@ -222,10 +193,11 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             />
             <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()}/>
             <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()}/>
-            <ContextMenu state={contextMenuState} 
-                handleLoadSummary={handleLoadSummary} 
-                handleDeleteNode={handleDeleteNode} 
-                handleLaunchWikipediaPage={handleLaunchWikipediaPage}/>
+            <ContextMenu 
+                state={contextMenuState} 
+                vis={vis} 
+                selectionLabels={selectionLabels}
+                setSummaries={setSummaries}/>
         </div>
         {/* sidebar */}
         <div className="sidebar">
