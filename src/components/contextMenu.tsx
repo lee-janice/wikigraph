@@ -48,7 +48,7 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, 
                     if (s.length === 0) {
                         setCurrentSummary(summary);
                     }
-                    s.push(summary);
+                    s.unshift(summary);
                 }
             })
         );
