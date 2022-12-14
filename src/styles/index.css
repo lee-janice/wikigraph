@@ -127,39 +127,48 @@ input:focus {
 /* ----- wikipedia summaries ----- */
 #wikipedia-summaries {
   margin: 2.5% 10%;
-  padding: 10px 15px;
   height: 60%;
-  border: 1px solid lightgray ; 
-  background-color: white;
+  background-color: #fffff8; 
   overflow: scroll;
 }
 
-.wikipedia-summary-tabs {
-  display: block;
+#wikipedia-summary-tabs {
+  overflow-x: scroll;
+  white-space: nowrap;
+  text-align: left;
+  height: 2.5em;
+  scrollbar-width: none; /* disable scroll bar on firefox */
+}
+
+/* disable scroll bar on gchrome */
+#wikipedia-summary-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .wikipedia-summary-tab {
-  float: left;
-  margin: 0 8px -1px 0;
+  display: inline-block;
+  margin: 8px 8px -1px 0;
   padding: 5px 5px;
   border: 1px solid lightgray;
   background-color: #fffff8; 
   border-radius: 8px 8px 0 0;
   cursor: pointer;
   font-size: small;
-  text-align: center;
+  text-align: left;
 }
 
 .wikipedia-summary {
-  /* border-top: 1px solid lightgray ;  */
+  border: 1px solid lightgray ; 
   font-size: x-small;
   text-align: left;
-  display: inline-block;
-  padding-top: 1em;
+  padding: 10px 15px;
+  background-color: white;
 }
 
 .tab-selected {
-  border-bottom: none;
+  margin-bottom: -4px;
+  z-index: 100000;
+  box-shadow: 0 0 3px 0 lightgray ;
   background-color: white; 
 }
 
