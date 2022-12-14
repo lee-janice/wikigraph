@@ -3,108 +3,118 @@ import React, { Dispatch, SetStateAction } from "react";
 import { getWikipediaExtract, getWikipediaLink, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
 
 export type ContextMenuState = {
-    open: boolean,
-    type: string,
-    x: number,
-    y: number,
-}
-
-interface Props {
-    state: ContextMenuState,
-    vis?: NeoVis|null,
-    selectionLabels: string[],
-    summaries: WikiSummary[],
-    setSummaries: Dispatch<SetStateAction<WikiSummary[]>>,
-    setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>,
+    open: boolean;
+    type: string;
+    x: number;
+    y: number;
 };
 
+interface Props {
+    state: ContextMenuState;
+    vis?: NeoVis | null;
+    selectionLabels: string[];
+    summaries: WikiSummary[];
+    setSummaries: Dispatch<SetStateAction<WikiSummary[]>>;
+    setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>;
+}
+
 const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, setSummaries, setCurrentSummary }) => {
-    const style = !state.open ? {display: `none`} : {
-        // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
-        position: `absolute` as `absolute`, 
-        left: state.x, 
-        top: state.y,
-        border: `1px solid lightgray`,
-        fontSize: `small`,
-        borderRadius: `5px`,
-        backgroundColor: `white`,
-    }
+    const style = !state.open
+        ? { display: `none` }
+        : {
+              // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
+              position: `absolute` as `absolute`,
+              left: state.x,
+              top: state.y,
+              border: `1px solid lightgray`,
+              fontSize: `small`,
+              borderRadius: `5px`,
+              backgroundColor: `white`,
+          };
 
     // event handler for "Load summaries from Wikipedia" context menu selection
     const handleLoadSummary = async () => {
         var s: WikiSummary[] = [...summaries];
-        await Promise.all(selectionLabels.map(async (label) => {
-            // only get the summary if it is not already loaded
-            if (s.filter(summary => summary.title === label).length === 0) {
-                const result = await searchWikipedia(label); 
-                const summary = {
-                    title: result.title, 
-                    text: await getWikipediaExtract(result.pageid),
-                };
-                // if it is the first summary generated so far, set it to the current summary
-                if (s.length === 0) {
-                    setCurrentSummary(summary);
-                };
-                s.push(summary);
-            }
-        }));
+        await Promise.all(
+            selectionLabels.map(async (label) => {
+                // only get the summary if it is not already loaded
+                if (s.filter((summary) => summary.title === label).length === 0) {
+                    const result = await searchWikipedia(label);
+                    const summary = {
+                        title: result.title,
+                        text: await getWikipediaExtract(result.pageid),
+                    };
+                    // if it is the first summary generated so far, set it to the current summary
+                    if (s.length === 0) {
+                        setCurrentSummary(summary);
+                    }
+                    s.push(summary);
+                }
+            })
+        );
         setSummaries(s);
     };
 
     // event handler for "Delete nodes" context menu selection
-    const handleDeleteNode = () => { 
+    const handleDeleteNode = () => {
         vis?.network?.deleteSelected();
     };
 
     // event handler for "Launch Wikipedia page" context menu selection
-    const handleLaunchWikipediaPage = async () => { 
-        await Promise.all(selectionLabels.map(async (label) => {
-            const result = await searchWikipedia(label); 
-            window.open(await getWikipediaLink(result.pageid), '_blank');
-        }));
+    const handleLaunchWikipediaPage = async () => {
+        await Promise.all(
+            selectionLabels.map(async (label) => {
+                const result = await searchWikipedia(label);
+                window.open(await getWikipediaLink(result.pageid), "_blank");
+            })
+        );
     };
 
     switch (state.type) {
-        case "node": 
+        case "node":
             return (
-                <div 
-                    className="context-menu" 
-                    id="context-menu"
-                    style={style}>
+                <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
-                        <li className="context-menu-item" onClick={handleLoadSummary}>Load summary from Wikipedia →</li>
-                        <li className="context-menu-item" onClick={handleDeleteNode}>Delete node</li>
-                        <hr/>
-                        <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>Launch Wikipedia page ↗</li>
+                        <li className="context-menu-item" onClick={handleLoadSummary}>
+                            Load summary from Wikipedia →
+                        </li>
+                        <li className="context-menu-item" onClick={handleDeleteNode}>
+                            Delete node
+                        </li>
+                        <hr />
+                        <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
+                            Launch Wikipedia page ↗
+                        </li>
                     </ul>
                 </div>
             );
-        case "nodes": 
+        case "nodes":
             return (
-                <div 
-                    className="context-menu" 
-                    id="context-menu"
-                    style={style}>
+                <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
-                        <li className="context-menu-item" onClick={handleLoadSummary}>Load summaries from Wikipedia →</li>
-                        <li className="context-menu-item" onClick={handleDeleteNode}>Delete nodes</li>
-                        <hr/>
-                        <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>Launch Wikipedia pages ↗</li>
+                        <li className="context-menu-item" onClick={handleLoadSummary}>
+                            Load summaries from Wikipedia →
+                        </li>
+                        <li className="context-menu-item" onClick={handleDeleteNode}>
+                            Delete nodes
+                        </li>
+                        <hr />
+                        <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
+                            Launch Wikipedia pages ↗
+                        </li>
                     </ul>
                 </div>
             );
-        case "canvas": 
+        case "canvas":
             return (
-                <div 
-                    className="context-menu" 
-                    id="context-menu"
-                    style={style}>
+                <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
                         <li className="context-menu-item">Open image in new tab</li>
                     </ul>
                 </div>
             );
-        default: return <div></div>
+        default:
+            return <div></div>;
     }
 };
 
