@@ -13,11 +13,12 @@ interface Props {
     state: ContextMenuState,
     vis?: NeoVis|null,
     selectionLabels: string[],
-    setSummaries: Dispatch<SetStateAction<WikiSummary[] | undefined>>,
+    summaries: WikiSummary[],
+    setSummaries: Dispatch<SetStateAction<WikiSummary[]>>,
 };
 
 // const ContextMenu: React.FC<Props> = ({ state, handleLoadSummary, handleDeleteNode, handleLaunchWikipediaPage }) => {
-const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, setSummaries }) => {
+const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, setSummaries }) => {
     const style = !state.open ? {display: `none`} : {
         // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
         position: `absolute` as `absolute`, 
@@ -31,17 +32,19 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, setSummarie
 
     // event handler for "Load summaries from Wikipedia" context menu selection
     const handleLoadSummary = async () => {
-        var summaries: Array<WikiSummary> = [];
+        var s: WikiSummary[] = [...summaries];
         await Promise.all(selectionLabels.map(async (label) => {
-            const result = await searchWikipedia(label); 
-            summaries.push({
-                title: result.title,
-                text: await getWikipediaExtract(result.pageid),
-                display: true,
-            });
+            // only get the summary if it is not already loaded
+            if (s.filter(summary => summary.title === label).length === 0) {
+                const result = await searchWikipedia(label); 
+                s.push({
+                    title: result.title,
+                    text: await getWikipediaExtract(result.pageid),
+                    display: true,
+                });
+            }
         }));
-        setSummaries(summaries);
-        // console.log(summaries);
+        setSummaries(s);
     };
 
     // event handler for "Delete nodes" context menu selection

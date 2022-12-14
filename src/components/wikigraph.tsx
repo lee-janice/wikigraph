@@ -21,10 +21,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     // keep vis object in state
     const [vis, updateVis] = useState<NeoVis|null>(null);
 	// keep track of selected nodes and labels
-	const [selection, setSelection] = useState<IdType[]|undefined>();
+	const [selection, setSelection] = useState<IdType[]>([]);
 	const [selectionLabels, setSelectionLabels] = useState([""]);
     // keep track of summaries 
-    const [summaries, setSummaries] = useState<WikiSummary[]>();
+    const [summaries, setSummaries] = useState<WikiSummary[]>([]);
 	// keep track of search bar input
 	const [input, setInput] = useState("");
 	const [search, setSearch] = useState("Universe");
@@ -197,6 +197,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 state={contextMenuState} 
                 vis={vis} 
                 selectionLabels={selectionLabels}
+                summaries={summaries}
                 setSummaries={setSummaries}/>
         </div>
         {/* sidebar */}

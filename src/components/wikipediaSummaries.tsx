@@ -10,7 +10,8 @@ interface Props {
     summaries?: WikiSummary[],
 };
 
-// Wikipedia API functions—probably should put into its own file
+// Wikipedia API functions
+// TODO: probably should put into its own file
 export async function searchWikipedia(searchQuery: string): Promise<{title: string, pageid: string}> {
     const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&origin=*`;
 
