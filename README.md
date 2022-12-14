@@ -1,4 +1,4 @@
-# [WikiGraph](https://wikigraph.netlify.app/)
+# WikiGraph
 A non-linear, graph-based approach to exploring the depths of Wikipedia
 
 ![Screenshot 2022-12-14 at 00-33-42 WikiGraph](https://user-images.githubusercontent.com/43253634/207545984-ca9613a5-865c-400b-9be3-e5c20dc9481e.png)
