@@ -1,7 +1,8 @@
 import NeoVis from "neovis.js";
 import React, { Dispatch, SetStateAction } from "react";
+import { getWikipediaExtract, getWikipediaLink, searchWikipedia } from "../api/wikipedia";
 import { IdType } from "./wikigraph";
-import { getWikipediaExtract, getWikipediaLink, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
+import { WikiSummary } from "./wikipediaSummaries";
 
 export type ContextMenuState = {
     open: boolean;
