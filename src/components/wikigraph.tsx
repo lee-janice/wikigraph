@@ -77,7 +77,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     // uses the Barnes-Hut algorithm to compute node positions
                     barnesHut: {
                         avoidOverlap: 1, // value between 0 and 1, 1 is maximum overlap avoidance
-                        gravitationalConstant: -15000,
+                        gravitationalConstant: -20000,
                         damping: 0.5,
                     },
                     maxVelocity: 5,
@@ -169,6 +169,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     // ----- event handler for "Update Graph with Selection" button press -----
     const handleUpdateWithSelection = () => {
         if (selection) {
+            // TODO: change this to be 10 per selection, not 10*(# selections)
             var cypher =
                 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
                 selection +
@@ -216,7 +217,15 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         backgroundColor: `white`,
                     }}
                 />
-                <input type="submit" value="Stabilize" id="stabilize-button" onClick={() => vis?.stabilize()} />
+                <input
+                    type="submit"
+                    value="Stabilize"
+                    id="stabilize-button"
+                    onClick={() => {
+                        vis?.stabilize();
+                        vis?.network?.fit();
+                    }}
+                />
                 <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
                 <ContextMenu
                     state={contextMenuState}

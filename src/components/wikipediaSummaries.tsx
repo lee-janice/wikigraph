@@ -14,7 +14,7 @@ interface Props {
 
 // Wikipedia API functions
 // TODO: probably should put into its own file
-export async function searchWikipedia(searchQuery: string): Promise<{ title: string; pageid: string }> {
+export async function searchWikipedia(searchQuery: string): Promise<{ title: string; pageid: number }> {
     const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&origin=*`;
 
     const response = await fetch(endpoint);
@@ -31,10 +31,10 @@ export async function searchWikipedia(searchQuery: string): Promise<{ title: str
 
     // return the Page ID of the best match
     const bestMatch = json.query.search[0];
-    return { title: bestMatch.title, pageid: bestMatch.pageid.toString() };
+    return { title: bestMatch.title, pageid: bestMatch.pageid };
 }
 
-export async function getWikipediaExtract(pageid: string) {
+export async function getWikipediaExtract(pageid: number) {
     const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro&explaintext&pageids=${pageid}&origin=*`;
 
     const response = await fetch(endpoint);
@@ -46,7 +46,7 @@ export async function getWikipediaExtract(pageid: string) {
     return json.query.pages[pageid].extract;
 }
 
-export async function getWikipediaLink(pageid: string) {
+export async function getWikipediaLink(pageid: number) {
     const endpoint = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=info&inprop=url&pageids=${pageid}&origin=*`;
 
     const response = await fetch(endpoint);
@@ -76,33 +76,44 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
     if (currentSummary) {
         return (
             <div id="wikipedia-summaries">
-                <div id="wikipedia-summary-tabs">
-                    {summaries?.map((summary, i) => {
-                        return (
-                            <div
-                                className={`wikipedia-summary-tab ${summary === currentSummary ? "tab-selected" : ""}`}
-                                key={summary.title}
-                                onClick={() => setCurrentSummary(summary)}
-                            >
-                                {summary.title}
+                <div id="wikipedia-summary-tabs-wrapper">
+                    <div id="wikipedia-summary-tabs">
+                        {summaries?.map((summary, i) => {
+                            return (
                                 <div
-                                    className="close-tab"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleCloseTab(summary, i);
-                                    }}
+                                    className={`wikipedia-summary-tab ${
+                                        summary === currentSummary ? "tab-selected" : ""
+                                    }`}
+                                    key={summary.title}
+                                    onClick={() => setCurrentSummary(summary)}
                                 >
-                                    ✕
+                                    {summary.title}
+                                    <div
+                                        className="close-tab"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleCloseTab(summary, i);
+                                        }}
+                                    >
+                                        ✕
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
                 <div className="wikipedia-summary">
                     <p style={{ fontSize: "large", textAlign: "center", margin: "0px 10px 10px 10px" }}>
                         {currentSummary.title}
                     </p>
-                    {currentSummary.text}
+                    {currentSummary.text.split("\n").map((text) => {
+                        return (
+                            <p key={text} style={{ whiteSpace: "pre-line" }}>
+                                {text}
+                                <br />
+                            </p>
+                        );
+                    })}
                 </div>
             </div>
         );
