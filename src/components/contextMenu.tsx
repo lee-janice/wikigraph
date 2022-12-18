@@ -1,5 +1,6 @@
 import NeoVis from "neovis.js";
 import React, { Dispatch, SetStateAction } from "react";
+import { IdType } from "./wikigraph";
 import { getWikipediaExtract, getWikipediaLink, searchWikipedia, WikiSummary } from "./wikipediaSummaries";
 
 export type ContextMenuState = {
@@ -12,13 +13,26 @@ export type ContextMenuState = {
 interface Props {
     state: ContextMenuState;
     vis?: NeoVis | null;
+    selection: IdType[];
+    setSelection: Dispatch<SetStateAction<IdType[]>>;
     selectionLabels: string[];
+    setSelectionLabels: Dispatch<SetStateAction<string[]>>;
     summaries: WikiSummary[];
     setSummaries: Dispatch<SetStateAction<WikiSummary[]>>;
     setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>;
 }
 
-const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, setSummaries, setCurrentSummary }) => {
+const ContextMenu: React.FC<Props> = ({
+    state,
+    vis,
+    selection,
+    setSelection,
+    selectionLabels,
+    setSelectionLabels,
+    summaries,
+    setSummaries,
+    setCurrentSummary,
+}) => {
     const style = !state.open
         ? { display: `none` }
         : {
@@ -32,7 +46,7 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, 
               backgroundColor: `white`,
           };
 
-    // event handler for "Load summaries from Wikipedia" context menu selection
+    // ----- event handler for "Load summaries from Wikipedia" context menu selection -----
     const handleLoadSummary = async () => {
         var s: WikiSummary[] = [...summaries];
         await Promise.all(
@@ -55,12 +69,30 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, 
         setSummaries(s);
     };
 
-    // event handler for "Delete nodes" context menu selection
+    // ----- event handler for "Update Graph with Selection" button press -----
+    const handleCreateNewGraph = () => {
+        if (selection) {
+            // TODO: change this to be 10 per selection, not 10*(# selections)
+            var cypher =
+                'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
+                selection +
+                '", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT ' +
+                10 * selection.length;
+            vis?.renderWithCypher(cypher);
+            // de-select old nodes once new vis is rendered
+            vis?.network?.setSelection({ nodes: [], edges: [] });
+            // reset selection state once new vis is re-rendered
+            setSelection([]);
+            setSelectionLabels([]);
+        }
+    };
+
+    // ----- event handler for "Delete nodes" context menu selection -----
     const handleDeleteNode = () => {
         vis?.network?.deleteSelected();
     };
 
-    // event handler for "Launch Wikipedia page" context menu selection
+    // ----- event handler for "Launch Wikipedia page" context menu selection -----
     const handleLaunchWikipediaPage = async () => {
         await Promise.all(
             selectionLabels.map(async (label) => {
@@ -75,6 +107,9 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, 
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
+                        <li className="context-menu-item" onClick={handleCreateNewGraph}>
+                            Create new graph with selection
+                        </li>
                         <li className="context-menu-item" onClick={handleLoadSummary}>
                             Load summary from Wikipedia →
                         </li>
@@ -92,6 +127,9 @@ const ContextMenu: React.FC<Props> = ({ state, vis, selectionLabels, summaries, 
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
+                        <li className="context-menu-item" onClick={handleCreateNewGraph}>
+                            Create new graph with selection
+                        </li>
                         <li className="context-menu-item" onClick={handleLoadSummary}>
                             Load summaries from Wikipedia →
                         </li>

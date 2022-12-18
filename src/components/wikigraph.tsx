@@ -1,6 +1,5 @@
 import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
-import SelectedNodes from "./selectedNodes";
 import WikipediaSummaries, { WikiSummary } from "./wikipediaSummaries";
 import ContextMenu, { ContextMenuState } from "./contextMenu";
 
@@ -166,24 +165,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         });
     }, [containerId, serverDatabase, serverURI, serverUser, serverPassword]);
 
-    // ----- event handler for "Update Graph with Selection" button press -----
-    const handleUpdateWithSelection = () => {
-        if (selection) {
-            // TODO: change this to be 10 per selection, not 10*(# selections)
-            var cypher =
-                'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
-                selection +
-                '", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT ' +
-                10 * selection.length;
-            vis?.renderWithCypher(cypher);
-            // de-select old nodes once new vis is rendered
-            vis?.network?.setSelection({ nodes: [], edges: [] });
-            // reset selection state once new vis is re-rendered
-            setSelection([]);
-            setSelectionLabels([]);
-        }
-    };
-
     // ----- execute cypher query when user inputs search, update visualization -----
     useEffect(() => {
         // TODO: replace this with something that does not open the DB up to an injection attack
@@ -230,7 +211,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 <ContextMenu
                     state={contextMenuState}
                     vis={vis}
+                    selection={selection}
+                    setSelection={setSelection}
                     selectionLabels={selectionLabels}
+                    setSelectionLabels={setSelectionLabels}
                     summaries={summaries}
                     setSummaries={setSummaries}
                     setCurrentSummary={setCurrentSummary}
@@ -238,8 +222,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             </div>
             {/* sidebar */}
             <div className="sidebar">
-                <SelectedNodes selectionLabels={selectionLabels} />
-                <input type="submit" value="Update Graph with Selection" onClick={handleUpdateWithSelection} />
+                {/* <SelectedNodes selectionLabels={selectionLabels} /> */}
                 <WikipediaSummaries
                     summaries={summaries}
                     setSummaries={setSummaries}

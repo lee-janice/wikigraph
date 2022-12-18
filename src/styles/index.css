@@ -125,7 +125,7 @@ input:focus {
 /* ----- wikipedia summaries ----- */
 #wikipedia-summaries {
     margin: 2.5% 10%;
-    height: 60%;
+    height: 80%;
     background-color: #fffff8;
     overflow: scroll;
 }

@@ -106,9 +106,11 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
                     <p style={{ fontSize: "large", textAlign: "center", margin: "0px 10px 10px 10px" }}>
                         {currentSummary.title}
                     </p>
-                    {currentSummary.text.split("\n").map((text) => {
+                    {/* // TODO: need to escape math elements: e.g. in the "Dark energy" summary */}
+                    {currentSummary.text.split("\n").map((text, i) => {
+                        console.log(currentSummary);
                         return (
-                            <p key={text} style={{ whiteSpace: "pre-line" }}>
+                            <p key={i} style={{ whiteSpace: "pre-line" }}>
                                 {text}
                                 <br />
                             </p>
