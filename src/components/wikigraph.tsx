@@ -16,7 +16,7 @@ interface Props {
 
 const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const { containerId, serverDatabase, serverURI, serverUser, serverPassword } = props;
-    // TODO: put this all into one state object
+
     // keep vis object in state
     const [vis, setVis] = useState<NeoVis | null>(null);
     // keep track of selected nodes and labels
