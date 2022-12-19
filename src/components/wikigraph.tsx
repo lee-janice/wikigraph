@@ -15,11 +15,17 @@ interface Props {
     serverURI: string;
     serverUser: string;
     serverPassword: string;
+    darkMode: boolean;
 }
 
-const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) => {
-    const { containerId, serverDatabase, serverURI, serverUser, serverPassword } = props;
-
+const WikiGraph: React.FC<Props> = ({
+    containerId,
+    serverDatabase,
+    serverURI,
+    serverUser,
+    serverPassword,
+    darkMode,
+}) => {
     // keep vis object in state
     const [vis, setVis] = useState<NeoVis | null>(null);
     const [expandedVis, setExpandedVis] = useState(false);
@@ -46,19 +52,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         x: 0,
         y: 0,
     });
-
-    // set initial theme and keep track of dark mode state
-    const [darkMode, setDarkMode] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    // handle change in dark mode toggle
-    useEffect(() => {
-        if (darkMode) {
-            document.body.classList.add("dark");
-            document.body.classList.remove("light");
-        } else {
-            document.body.classList.add("light");
-            document.body.classList.remove("dark");
-        }
-    }, [darkMode]);
 
     // get reference to selection so that we can use the current value in the vis event listeners
     // otherwise, the value lags behind
@@ -225,7 +218,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         : { height: `80%`, width: `60%`, position: `fixed` }
                 }
             >
-                <div id={containerId} ref={ref} />
+                <div id={containerId} />
                 <img
                     src={
                         expandedVis
@@ -292,12 +285,8 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 {currentNavTab === NavTab.About && <About />}
                 {currentNavTab === NavTab.UserManual && <UserManual />}
             </div>
-            {/* light/dark mode toggle */}
-            <label id="theme-toggle">
-                <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} /> Dark mode
-            </label>
         </div>
     );
-});
+};
 
 export default WikiGraph;
