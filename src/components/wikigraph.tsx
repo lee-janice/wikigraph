@@ -5,6 +5,52 @@ import NavBar, { NavTab } from "./sidebar/navbar";
 import UserManual from "./sidebar/userManual";
 import About from "./sidebar/about";
 import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
+import styled from "styled-components";
+
+const StyledCanvas = styled.div`
+    height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
+    width: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
+    top: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
+    left: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
+    position: fixed;
+    z-index: 10000;
+
+    @media (max-width: 1100px) {
+        height: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
+        width: ${(props) => (props.theme.expanded ? "100%;" : "90%;")}
+    }
+`;
+
+StyledCanvas.defaultProps = {
+    theme: {
+        expanded: false,
+    },
+};
+
+const StyledSidebar = styled.div`
+    height: 100%;
+    width: 33%;
+    position: fixed; /* stay in place on scroll */
+    z-index: 100;
+    top: 0;
+    right: 0;
+    background-color: var(--primaryBackgroundColor);
+    overflow-x: hidden; /* disable horizontal scroll */
+    padding-top: 20px;
+    border-left: 1px solid var(--borderColor);
+
+    @media (max-width: 1100px) {
+        top: 80%;
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        // padding-top: 0px;
+        border-left: none;
+        border-top: 1px solid var(--borderColor);
+        z-index: 100000;
+    }
+`;
 
 // TODO: figure out how to import this from vis.js
 export type IdType = string | number;
@@ -202,23 +248,9 @@ const WikiGraph: React.FC<Props> = ({
     }, [search, vis]);
 
     return (
-        <div>
+        <>
             {/* graph visualization */}
-            <div
-                id="canvas"
-                style={
-                    expandedVis
-                        ? {
-                              top: "0px",
-                              left: "0px",
-                              height: `100%`,
-                              width: `100%`,
-                              position: `fixed`,
-                              zIndex: "100000",
-                          }
-                        : { height: `80%`, width: `60%`, position: `fixed` }
-                }
-            >
+            <StyledCanvas theme={{ expanded: expandedVis }} id="canvas">
                 <div id={containerId} />
                 <img
                     src={
@@ -257,9 +289,10 @@ const WikiGraph: React.FC<Props> = ({
                     setSummaries={setSummaries}
                     setCurrentSummary={setCurrentSummary}
                 />
-            </div>
+            </StyledCanvas>
             {/* sidebar */}
-            <div className="sidebar">
+            {/* <div className="sidebar"> */}
+            <StyledSidebar className="sidebar">
                 <NavBar currentNavTab={currentNavTab} setCurrentNavTab={setCurrentNavTab} />
                 {currentNavTab === NavTab.Home && (
                     <>
@@ -285,8 +318,8 @@ const WikiGraph: React.FC<Props> = ({
                 )}
                 {currentNavTab === NavTab.About && <About />}
                 {currentNavTab === NavTab.UserManual && <UserManual />}
-            </div>
-        </div>
+            </StyledSidebar>
+        </>
     );
 };
 
