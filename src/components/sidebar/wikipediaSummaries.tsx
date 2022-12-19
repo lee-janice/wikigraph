@@ -30,42 +30,35 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
     if (currentSummary) {
         return (
             <div id="wikipedia-summaries">
-                <div id="wikipedia-summary-tabs-wrapper">
-                    <div id="wikipedia-summary-tabs">
-                        {summaries?.map((summary, i) => {
-                            return (
+                <div id="wikipedia-summary-tabs">
+                    {summaries?.map((summary, i) => {
+                        return (
+                            <div
+                                className={`wikipedia-summary-tab ${summary === currentSummary ? "tab-selected" : ""}`}
+                                key={summary.title}
+                                onClick={() => setCurrentSummary(summary)}
+                            >
+                                {summary.title}
                                 <div
-                                    className={`wikipedia-summary-tab ${
-                                        summary === currentSummary ? "tab-selected" : ""
-                                    }`}
-                                    key={summary.title}
-                                    onClick={() => setCurrentSummary(summary)}
+                                    className="close-tab"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCloseTab(summary, i);
+                                    }}
                                 >
-                                    {summary.title}
-                                    <div
-                                        className="close-tab"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleCloseTab(summary, i);
-                                        }}
-                                    >
-                                        ✕
-                                    </div>
+                                    ✕
                                 </div>
-                            );
-                        })}
-                    </div>
+                            </div>
+                        );
+                    })}
                 </div>
                 <div className="wikipedia-summary">
-                    <p style={{ fontSize: "large", textAlign: "center", margin: "0px 10px 10px 10px" }}>
-                        {currentSummary.title}
-                    </p>
+                    <h1>{currentSummary.title}</h1>
                     {/* // TODO: need to escape math elements: e.g. in the "Dark energy" summary */}
                     {currentSummary.text.split("\n").map((text, i) => {
                         return (
                             <p key={i} style={{ whiteSpace: "pre-line" }}>
                                 {text}
-                                <br />
                             </p>
                         );
                     })}
@@ -77,10 +70,9 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
             <div id="wikipedia-summaries">
                 <div id="wikipedia-summary-tabs"></div>
                 <div className="wikipedia-summary">
-                    <p style={{ fontSize: "large", textAlign: "center", margin: "0px 10px 10px 10px" }}>
-                        Wikipedia Summaries
-                    </p>
-                    <p style={{ textAlign: "center" }}>Summaries from Wikipedia will appear here.</p>
+                    <h1>Wikipedia Summaries</h1>
+                    Article summaries from Wikipedia will appear here. To generate a summary, right-click a node in the
+                    graph and click <em>Load summary from Wikipedia</em>.
                 </div>
             </div>
         );

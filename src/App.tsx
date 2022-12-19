@@ -15,7 +15,9 @@ function App() {
     return (
         <Layout>
             <header>
-                <h1>WikiGraph</h1>
+                <h1>
+                    <strong>WikiGraph</strong>
+                </h1>
                 <p className="subtitle">A graph-based approach to exploring the depths of Wikipedia</p>
             </header>
             <div className="App">

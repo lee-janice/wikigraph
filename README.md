@@ -6,9 +6,10 @@ A non-linear, graph-based approach to exploring the depths of Wikipedia
 
 ## TODOs
 
--   [ ] Add how-to-use tab on sidebar
--   [ ] Add info tab on sidebar
+-   [x] Add how-to-use tab on sidebar
+-   [x] Add info tab on sidebar
 -   [ ] Add ability to full-screen the visualization
+-   [ ] Recenter visualization when graph rerenders
 -   [ ] Add dark mode
 -   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
 -   [x] Move "Update graph with selection" option to context menu

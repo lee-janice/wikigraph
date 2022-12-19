@@ -1,7 +1,10 @@
 import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
-import WikipediaSummaries, { WikiSummary } from "./wikipediaSummaries";
-import ContextMenu, { ContextMenuState } from "./contextMenu";
+import ContextMenu, { ContextMenuState, ContextMenuType } from "./contextMenu";
+import NavBar, { NavTab } from "./sidebar/navbar";
+import UserManual from "./sidebar/userManual";
+import About from "./sidebar/about";
+import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 
 // TODO: figure out how to import this from vis.js
 export type IdType = string | number;
@@ -19,19 +22,26 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
     // keep vis object in state
     const [vis, setVis] = useState<NeoVis | null>(null);
+
     // keep track of selected nodes and labels
     const [selection, setSelection] = useState<IdType[]>([]);
     const [selectionLabels, setSelectionLabels] = useState([""]);
+
     // keep track of summaries
     const [summaries, setSummaries] = useState<WikiSummary[]>([]);
     const [currentSummary, setCurrentSummary] = useState<WikiSummary | null>(null);
+
     // keep track of search bar input
     const [input, setInput] = useState("");
     const [search, setSearch] = useState("Universe");
+
+    // keep track of nav bar tab state
+    const [currentNavTab, setCurrentNavTab] = useState<NavTab>(NavTab.Home);
+
     // keep track of whether the context menu is open or closed
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
         open: false,
-        type: "canvas",
+        type: ContextMenuType.Canvas,
         x: 0,
         y: 0,
     });
@@ -82,13 +92,13 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     maxVelocity: 5,
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
-                layout: { randomSeed: 47 },
+                layout: { randomSeed: 1337 },
             },
             // node and edge settings
             labels: { Page: { label: "title", size: "clicksInto" } },
             relationships: { LINKS_TO: { value: "quantity" } },
             initialCypher:
-                "MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = 'Universe' RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10",
+                "MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = 'Universe' RETURN p1, l, p2 ORDER BY l.quantity",
         };
         const vis: NeoVis = new NeoVis(config);
         vis.render();
@@ -121,7 +131,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
             // 2. listener for "click"
             vis.network?.on("click", (e) => {
-                setContextMenuState({ open: false, type: "canvas", x: 0, y: 0 });
+                setContextMenuState({ open: false, type: ContextMenuType.Canvas, x: 0, y: 0 });
             });
 
             // 3. listener for "double click"
@@ -139,7 +149,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 let correctedX = click.event.x - rect.x;
                 let correctedY = click.event.y - rect.y;
 
-                var type = "";
+                var type = ContextMenuType.Canvas;
                 // check if there's a node under the cursor
                 var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
                 if (nodeId) {
@@ -154,10 +164,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     const nodeIds = vis.network?.getSelectedNodes();
                     if (nodeIds) {
                         updateSelectionState(nodeIds);
-                        nodeIds.length > 1 ? (type = "nodes") : (type = "node");
+                        nodeIds.length > 1 ? (type = ContextMenuType.Nodes) : (type = ContextMenuType.Node);
                     }
                 } else {
-                    type = "canvas";
+                    type = ContextMenuType.Canvas;
                 }
 
                 setContextMenuState({ open: true, type: type, x: correctedX, y: correctedY });
@@ -222,21 +232,32 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             </div>
             {/* sidebar */}
             <div className="sidebar">
+                <NavBar currentNavTab={currentNavTab} setCurrentNavTab={setCurrentNavTab} />
                 {/* <SelectedNodes selectionLabels={selectionLabels} /> */}
-                <WikipediaSummaries
-                    summaries={summaries}
-                    setSummaries={setSummaries}
-                    currentSummary={currentSummary}
-                    setCurrentSummary={setCurrentSummary}
-                />
-                <div className="search-bar">
-                    Search for a Wikipedia article:
-                    <br />
-                    <form id="search" action="#" onSubmit={() => setSearch(input)}>
-                        <input type="search" placeholder="Article title" onChange={(e) => setInput(e.target.value)} />
-                        <input type="submit" value="Submit" onClick={() => setSearch(input)} />
-                    </form>
-                </div>
+                {currentNavTab === NavTab.Home && (
+                    <>
+                        <WikipediaSummaries
+                            summaries={summaries}
+                            setSummaries={setSummaries}
+                            currentSummary={currentSummary}
+                            setCurrentSummary={setCurrentSummary}
+                        />
+                        <div className="search-bar">
+                            Search for a Wikipedia article:
+                            <br />
+                            <form id="search" action="#" onSubmit={() => setSearch(input)}>
+                                <input
+                                    type="search"
+                                    placeholder="Article title"
+                                    onChange={(e) => setInput(e.target.value)}
+                                />
+                                <input type="submit" value="Submit" onClick={() => setSearch(input)} />
+                            </form>
+                        </div>
+                    </>
+                )}
+                {currentNavTab === NavTab.About && <About />}
+                {currentNavTab === NavTab.UserManual && <UserManual />}
             </div>
         </div>
     );

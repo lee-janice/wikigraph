@@ -1,12 +1,19 @@
+import html2canvas from "html2canvas";
 import NeoVis from "neovis.js";
 import React, { Dispatch, SetStateAction } from "react";
 import { getWikipediaExtract, getWikipediaLink, searchWikipedia } from "../api/wikipedia";
+import { WikiSummary } from "./sidebar/wikipediaSummaries";
 import { IdType } from "./wikigraph";
-import { WikiSummary } from "./wikipediaSummaries";
+
+export enum ContextMenuType {
+    Node,
+    Nodes,
+    Canvas,
+}
 
 export type ContextMenuState = {
     open: boolean;
-    type: string;
+    type: ContextMenuType;
     x: number;
     y: number;
 };
@@ -73,12 +80,10 @@ const ContextMenu: React.FC<Props> = ({
     // ----- event handler for "Update Graph with Selection" button press -----
     const handleCreateNewGraph = () => {
         if (selection) {
-            // TODO: change this to be 10 per selection, not 10*(# selections)
             var cypher =
                 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
                 selection +
-                '", ",") RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT ' +
-                10 * selection.length;
+                '", ",") RETURN p1, l, p2';
             vis?.renderWithCypher(cypher);
             // de-select old nodes once new vis is rendered
             vis?.network?.setSelection({ nodes: [], edges: [] });
@@ -103,8 +108,19 @@ const ContextMenu: React.FC<Props> = ({
         );
     };
 
+    // ----- event handler for "Open image in new tab" context menu selection -----
+    const handleOpenImage = () => {
+        const canvas = document.getElementsByTagName("canvas")[0] as HTMLCanvasElement;
+        if (canvas) {
+            const vis = document.getElementById("vis");
+            html2canvas(canvas, { width: vis?.offsetWidth, height: vis?.offsetHeight }).then((canvas) => {
+                window.open(canvas.toDataURL());
+            });
+        }
+    };
+
     switch (state.type) {
-        case "node":
+        case ContextMenuType.Node:
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
@@ -124,7 +140,7 @@ const ContextMenu: React.FC<Props> = ({
                     </ul>
                 </div>
             );
-        case "nodes":
+        case ContextMenuType.Nodes:
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
@@ -144,11 +160,13 @@ const ContextMenu: React.FC<Props> = ({
                     </ul>
                 </div>
             );
-        case "canvas":
+        case ContextMenuType.Canvas:
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
-                        <li className="context-menu-item">Open image in new tab</li>
+                        <li className="context-menu-item" onClick={handleOpenImage}>
+                            Open image in new tab
+                        </li>
                     </ul>
                 </div>
             );

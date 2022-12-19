@@ -10,6 +10,17 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+h1,
+h2,
+h3,
+h4 {
+    font-weight: normal;
+}
+
+a {
+    color: black;
+}
+
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
@@ -109,6 +120,37 @@ input:focus {
     border: 1px solid lightgray;
 }
 
+.sidebar-content {
+    margin: 2.5% 10%;
+    border: 1px solid lightgray;
+    font-size: x-small;
+    text-align: left;
+    padding: 10px 15px;
+    background-color: white;
+    height: 85%;
+    overflow: scroll;
+}
+
+.sidebar-content-title {
+    font-size: large;
+    text-align: center;
+    margin: 0px 10px 10px 10px;
+}
+
+/* A. Home -------------------------------------------------------------------*/
+/* ----- selected nodes ----- */
+#selected-node-list {
+    text-align: left;
+    height: 3em;
+    margin: 2.5% 25%;
+    padding: 10px 15px;
+    border: 1px solid lightgray;
+    background-color: white;
+    font-size: small;
+    list-style-type: none;
+    overflow: scroll;
+}
+
 /* ----- wikipedia summaries ----- */
 #wikipedia-summaries {
     margin: 2.5% 10%;
@@ -174,3 +216,5 @@ input:focus {
     position: absolute;
     bottom: 2%;
 }
+
+/* B. How to Use -------------------------------------------------------------*/
