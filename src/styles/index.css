@@ -8,8 +8,9 @@
     --lightBorder: lightgray;
     --blackText: #111;
     /* dark styles */
-    --primaryDarkBackground: #151515;
-    --secondaryDarkBackground: #1f1f1f;
+    /* --primaryDarkBackground: #151515; */
+    --primaryDarkBackground: #222222;
+    --secondaryDarkBackground: #2a2a2a;
     --darkBorder: darkgray;
     --whiteText: #ddd;
 }
