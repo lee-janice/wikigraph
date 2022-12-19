@@ -230,11 +230,11 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                     src={
                         expandedVis
                             ? darkMode
-                                ? "collapse-white.png"
-                                : "collapse.png"
+                                ? "icons/collapse-white.png"
+                                : "icons/collapse.png"
                             : darkMode
-                            ? "expand-white.png"
-                            : "expand.png"
+                            ? "icons/expand-white.png"
+                            : "icons/expand.png"
                     }
                     alt={expandedVis ? "Collapse visualization button" : "Expand visualization button"}
                     className="vis-expand-button"
