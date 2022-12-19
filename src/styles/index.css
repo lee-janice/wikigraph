@@ -109,25 +109,11 @@ input:focus {
     border: 1px solid lightgray;
 }
 
-/* ----- selected nodes ----- */
-#selected-node-list {
-    text-align: left;
-    height: 3em;
-    margin: 2.5% 25%;
-    padding: 10px 15px;
-    border: 1px solid lightgray;
-    background-color: white;
-    font-size: small;
-    list-style-type: none;
-    overflow: scroll;
-}
-
 /* ----- wikipedia summaries ----- */
 #wikipedia-summaries {
     margin: 2.5% 10%;
     height: 80%;
     background-color: #fffff8;
-    overflow: scroll;
 }
 
 #wikipedia-summary-tabs {
@@ -161,6 +147,8 @@ input:focus {
     text-align: left;
     padding: 10px 15px;
     background-color: white;
+    height: 80%;
+    overflow: scroll;
 }
 
 .tab-selected {
