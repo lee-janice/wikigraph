@@ -12,11 +12,11 @@ const StyledCanvas = styled.div`
     width: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
     top: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
     left: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
+    z-index: ${(props) => (props.theme.expanded ? "1000000;" : "100;")}
     position: fixed;
-    z-index: 10000;
 
     @media (max-width: 1100px) {
-        height: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
+        height: ${(props) => (props.theme.expanded ? "100%;" : "55%;")}
         width: ${(props) => (props.theme.expanded ? "100%;" : "90%;")}
     }
 `;
@@ -27,6 +27,7 @@ StyledCanvas.defaultProps = {
     },
 };
 
+/* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
 const StyledSidebar = styled.div`
     height: 100%;
     width: 33%;
@@ -45,7 +46,6 @@ const StyledSidebar = styled.div`
         position: absolute;
         height: 100%;
         width: 100%;
-        // padding-top: 0px;
         border-left: none;
         border-top: 1px solid var(--borderColor);
         z-index: 100000;

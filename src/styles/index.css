@@ -170,20 +170,6 @@ input:focus {
 /*----------------------------------------------------------------------------*/
 /* 2. sidebar styling 
 /*----------------------------------------------------------------------------*/
-/* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
-.sidebar {
-    height: 100%;
-    width: 33%;
-    position: fixed; /* stay in place on scroll */
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: var(--primaryBackgroundColor);
-    overflow-x: hidden; /* disable horizontal scroll */
-    padding-top: 20px;
-    border-left: 1px solid var(--borderColor);
-}
-
 .sidebar-content {
     margin: 2.5% 10%;
     border: 1px solid var(--borderColor);
