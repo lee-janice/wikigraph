@@ -87,6 +87,7 @@ const ContextMenu: React.FC<Props> = ({
                 selection +
                 '", ",") RETURN p1, l, p2';
             vis?.renderWithCypher(cypher);
+            vis?.network?.moveTo({ position: { x: 0, y: 0 } });
             // de-select old nodes once new vis is rendered
             vis?.network?.setSelection({ nodes: [], edges: [] });
             // reset selection state once new vis is re-rendered

@@ -195,6 +195,7 @@ const WikiGraph: React.FC<Props> = ({
         // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
         if (cypher.length > 0) {
             vis?.renderWithCypher(cypher);
+            vis?.network?.moveTo({ position: { x: 0, y: 0 } });
         } else {
             vis?.reload();
         }
