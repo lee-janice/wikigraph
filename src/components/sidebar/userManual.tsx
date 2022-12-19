@@ -143,7 +143,7 @@ const UserManual: React.FC = () => {
                 <code>Nodes</code>
             </h3>
             This context is activated when there is a node underneath the cursor and <em>multiple</em> nodes are
-            selected. The options in this menu are identical to the ones for <code>Node</code>, except it applies to all
+            selected. The options in this menu are identical to the ones for <code>Node</code>, except they apply to all
             selected nodes rather than a singular node.
             <h3>
                 <code>Canvas</code>

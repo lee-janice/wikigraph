@@ -5,11 +5,13 @@
     /* light styles */
     --primaryLightBackground: #fffff8;
     --secondaryLightBackground: white;
+    --hoverLightBackground: ghostwhite;
     --lightBorder: lightgray;
     --blackText: #111;
     /* dark styles */
     --primaryDarkBackground: #191919;
     --secondaryDarkBackground: #202122;
+    --hoverDarkBackground: #34282c;
     --darkBorder: #585858;
     --whiteText: #ddd;
 }
@@ -19,6 +21,7 @@
     --primaryBackgroundColor: var(--primaryLightBackground);
     --secondaryBackgroundColor: var(--secondaryLightBackground);
     --buttonBackgroundColor: white;
+    --hoverBackgroundColor: var(--hoverLightBackground);
     --fontColor: var(--blackText);
     --borderColor: var(--lightBorder);
 }
@@ -28,6 +31,7 @@
     --primaryBackgroundColor: var(--primaryDarkBackground);
     --secondaryBackgroundColor: var(--secondaryDarkBackground);
     --buttonBackgroundColor: var(--primaryBackgroundColor);
+    --hoverBackgroundColor: var(--hoverDarkBackground);
     --fontColor: var(--whiteText);
     --borderColor: var(--darkBorder);
 }
@@ -137,17 +141,18 @@ input:focus {
     padding-right: 15px;
     margin-top: 10px;
     margin-bottom: 10px;
-    z-index: 100;
-    color: var(--blackText);
+    color: var(--fontColor);
 }
 
 .context-menu-item {
     margin-bottom: 10px;
+    padding-right: 10px;
     cursor: pointer;
 }
 
 .context-menu-item:hover {
-    background-color: ghostwhite;
+    background-color: var(--hoverBackgroundColor);
+    border-radius: 3px;
 }
 
 .context-menu-link {

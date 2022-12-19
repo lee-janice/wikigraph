@@ -254,6 +254,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 <ContextMenu
                     state={contextMenuState}
                     vis={vis}
+                    darkMode={darkMode}
                     selection={selection}
                     setSelection={setSelection}
                     selectionLabels={selectionLabels}

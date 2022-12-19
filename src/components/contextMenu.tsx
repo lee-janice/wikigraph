@@ -21,6 +21,7 @@ export type ContextMenuState = {
 interface Props {
     state: ContextMenuState;
     vis?: NeoVis | null;
+    darkMode: boolean;
     selection: IdType[];
     setSelection: Dispatch<SetStateAction<IdType[]>>;
     selectionLabels: string[];
@@ -33,6 +34,7 @@ interface Props {
 const ContextMenu: React.FC<Props> = ({
     state,
     vis,
+    darkMode,
     selection,
     setSelection,
     selectionLabels,
@@ -48,10 +50,10 @@ const ContextMenu: React.FC<Props> = ({
               position: `absolute` as `absolute`,
               left: state.x,
               top: state.y,
-              border: `1px solid lightgray`,
+              border: `1px solid var(--borderColor)`,
               fontSize: `small`,
               borderRadius: `5px`,
-              backgroundColor: `white`,
+              backgroundColor: darkMode ? `#202122f2` : `#fffffff2`,
           };
 
     // ----- event handler for "Load summaries from Wikipedia" context menu selection -----
@@ -135,7 +137,11 @@ const ContextMenu: React.FC<Props> = ({
                         </li>
                         <hr />
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
-                            <img src="wikipedia.png" alt="" style={{ height: "1.2em", verticalAlign: "bottom" }} />{" "}
+                            <img
+                                src={darkMode ? "wikipedia-white.png" : "wikipedia.png"}
+                                alt=""
+                                style={{ height: "1.2em", verticalAlign: "bottom" }}
+                            />{" "}
                             Launch Wikipedia page ↗
                         </li>
                     </ul>
@@ -156,7 +162,11 @@ const ContextMenu: React.FC<Props> = ({
                         </li>
                         <hr />
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
-                            <img src="wikipedia.png" alt="" style={{ height: "1.2em", verticalAlign: "bottom" }} />{" "}
+                            <img
+                                src={darkMode ? "wikipedia-white.png" : "wikipedia.png"}
+                                alt=""
+                                style={{ height: "1.2em", verticalAlign: "bottom" }}
+                            />{" "}
                             Launch Wikipedia pages ↗
                         </li>
                     </ul>
