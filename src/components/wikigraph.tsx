@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
 import ContextMenu, { ContextMenuState, ContextMenuType } from "./contextMenu";
 import NavBar, { NavTab } from "./sidebar/navbar";

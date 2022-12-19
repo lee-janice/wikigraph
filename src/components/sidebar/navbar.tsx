@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { styled } from "../../styles/theme";
+import styled from "styled-components";
 
 // style navigation bar using styled-components
 const StyledNav = styled.nav`
