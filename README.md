@@ -13,6 +13,7 @@ A non-linear, graph-based approach to exploring the depths of Wikipedia
 -   [x] Add dark mode
 -   [x] Recenter visualization when graph rerenders
 -   [x] Fix formatting on mobile
+-   [ ] Add alternative to context menu on mobile
 -   [ ] Add link to Wikipedia page on the summaries
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Add keep selected nodes to context menu

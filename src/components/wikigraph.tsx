@@ -12,7 +12,7 @@ const StyledCanvas = styled.div`
     width: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
     top: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
     left: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
-    z-index: ${(props) => (props.theme.expanded ? "1000000;" : "100;")}
+    z-index: ${(props) => (props.theme.expanded ? "100000;" : "100;")}
     position: fixed;
 
     @media (max-width: 1100px) {
@@ -31,24 +31,24 @@ StyledCanvas.defaultProps = {
 const StyledSidebar = styled.div`
     height: 100%;
     width: 33%;
-    position: fixed; /* stay in place on scroll */
-    z-index: 100;
+    padding-top: 20px;
     top: 0;
     right: 0;
-    background-color: var(--primaryBackgroundColor);
+    position: fixed; /* stay in place on scroll */
+    z-index: 100;
     overflow-x: hidden; /* disable horizontal scroll */
-    padding-top: 20px;
     border-left: 1px solid var(--borderColor);
+    background-color: var(--primaryBackgroundColor);
 
     @media (max-width: 1100px) {
+        height: 100%;
+        width: 100%;
         top: 80%;
         display: block;
         position: absolute;
-        height: 100%;
-        width: 100%;
+        z-index: 10000;
         border-left: none;
         border-top: 1px solid var(--borderColor);
-        z-index: 100000;
     }
 `;
 
@@ -278,9 +278,10 @@ const WikiGraph: React.FC<Props> = ({
                 />
                 <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
                 <ContextMenu
-                    state={contextMenuState}
                     vis={vis}
                     darkMode={darkMode}
+                    state={contextMenuState}
+                    setState={setContextMenuState}
                     selection={selection}
                     setSelection={setSelection}
                     selectionLabels={selectionLabels}
@@ -291,7 +292,6 @@ const WikiGraph: React.FC<Props> = ({
                 />
             </StyledCanvas>
             {/* sidebar */}
-            {/* <div className="sidebar"> */}
             <StyledSidebar className="sidebar">
                 <NavBar currentNavTab={currentNavTab} setCurrentNavTab={setCurrentNavTab} />
                 {currentNavTab === NavTab.Home && (

@@ -19,9 +19,10 @@ export type ContextMenuState = {
 };
 
 interface Props {
-    state: ContextMenuState;
     vis?: NeoVis | null;
     darkMode: boolean;
+    state: ContextMenuState;
+    setState: Dispatch<SetStateAction<ContextMenuState>>;
     selection: IdType[];
     setSelection: Dispatch<SetStateAction<IdType[]>>;
     selectionLabels: string[];
@@ -32,9 +33,10 @@ interface Props {
 }
 
 const ContextMenu: React.FC<Props> = ({
-    state,
     vis,
     darkMode,
+    state,
+    setState,
     selection,
     setSelection,
     selectionLabels,
@@ -55,6 +57,27 @@ const ContextMenu: React.FC<Props> = ({
               borderRadius: `5px`,
               backgroundColor: darkMode ? `#202122f2` : `#fffffff2`,
           };
+
+    // ----- event handler for "Update Graph with Selection" button press -----
+    const handleCreateNewGraph = () => {
+        if (selection) {
+            var cypher =
+                'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
+                selection +
+                '", ",") RETURN p1, l, p2';
+            vis?.renderWithCypher(cypher);
+            vis?.network?.moveTo({ position: { x: 0, y: 0 } });
+
+            // de-select old nodes once new vis is rendered
+            vis?.network?.setSelection({ nodes: [], edges: [] });
+            // reset selection state once new vis is re-rendered
+            setSelection([]);
+            setSelectionLabels([]);
+
+            // close context menu
+            setState({ ...state, open: false });
+        }
+    };
 
     // ----- event handler for "Load summaries from Wikipedia" context menu selection -----
     const handleLoadSummary = async () => {
@@ -77,28 +100,17 @@ const ContextMenu: React.FC<Props> = ({
             })
         );
         setSummaries(s);
-    };
 
-    // ----- event handler for "Update Graph with Selection" button press -----
-    const handleCreateNewGraph = () => {
-        if (selection) {
-            var cypher =
-                'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
-                selection +
-                '", ",") RETURN p1, l, p2';
-            vis?.renderWithCypher(cypher);
-            vis?.network?.moveTo({ position: { x: 0, y: 0 } });
-            // de-select old nodes once new vis is rendered
-            vis?.network?.setSelection({ nodes: [], edges: [] });
-            // reset selection state once new vis is re-rendered
-            setSelection([]);
-            setSelectionLabels([]);
-        }
+        // close context menu
+        setState({ ...state, open: false });
     };
 
     // ----- event handler for "Delete nodes" context menu selection -----
     const handleDeleteNode = () => {
         vis?.network?.deleteSelected();
+
+        // close context menu
+        setState({ ...state, open: false });
     };
 
     // ----- event handler for "Launch Wikipedia page" context menu selection -----
@@ -109,6 +121,8 @@ const ContextMenu: React.FC<Props> = ({
                 window.open(await getWikipediaLink(result.pageid), "_blank");
             })
         );
+        // close context menu
+        setState({ ...state, open: false });
     };
 
     // ----- event handler for "Open image in new tab" context menu selection -----
@@ -120,6 +134,8 @@ const ContextMenu: React.FC<Props> = ({
                 window.open(canvas.toDataURL());
             });
         }
+        // close context menu
+        setState({ ...state, open: false });
     };
 
     switch (state.type) {
