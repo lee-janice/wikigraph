@@ -47,6 +47,10 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         y: 0,
     });
 
+    // keep track of theme
+    const [darkMode, setDarkMode] = useState(false);
+    document.body.classList.add("light");
+
     // get reference to selection so that we can use the current value in the vis event listeners
     // otherwise, the value lags behind
     const selectionRef = useRef(selection);
@@ -184,7 +188,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             search +
             '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
             search +
-            '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page) WHERE p1.title = title RETURN p1, l, p2 ORDER BY l.quantity DESC LIMIT 10';
+            '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
 
         // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
         if (cypher.length > 0) {
@@ -212,17 +216,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         : { height: `80%`, width: `60%`, position: `fixed` }
                 }
             >
-                <div
-                    id={containerId}
-                    ref={ref}
-                    style={{
-                        float: `left`,
-                        width: `100%`,
-                        height: `100%`,
-                        border: `1px solid lightgray`,
-                        backgroundColor: `white`,
-                    }}
-                />
+                <div id={containerId} ref={ref} />
                 {expandedVis ? (
                     <img
                         src="collapse.png"
@@ -290,6 +284,33 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 {currentNavTab === NavTab.About && <About />}
                 {currentNavTab === NavTab.UserManual && <UserManual />}
             </div>
+            {/* light/dark mode toggle */}
+            <label
+                style={{
+                    float: "right",
+                    fontSize: "small",
+                    position: "fixed",
+                    right: 15,
+                    bottom: 10,
+                    zIndex: 1000000,
+                }}
+            >
+                <input
+                    type="checkbox"
+                    checked={darkMode}
+                    onChange={(e) => {
+                        setDarkMode(!darkMode);
+                        if (e.target.checked) {
+                            document.body.classList.add("dark");
+                            document.body.classList.remove("light");
+                        } else {
+                            document.body.classList.add("light");
+                            document.body.classList.remove("dark");
+                        }
+                    }}
+                />{" "}
+                Dark mode
+            </label>
         </div>
     );
 });

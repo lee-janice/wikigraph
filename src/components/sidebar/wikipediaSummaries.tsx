@@ -70,7 +70,7 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
             <div id="wikipedia-summaries">
                 <div id="wikipedia-summary-tabs"></div>
                 <div className="wikipedia-summary">
-                    <h1>Wikipedia Summaries</h1>
+                    <h1>Wikipedia summaries</h1>
                     Article summaries from Wikipedia will appear here. To generate a summary, right-click a node in the
                     graph and click <em>Load summary from Wikipedia</em>.
                 </div>
