@@ -8,10 +8,9 @@
     --lightBorder: lightgray;
     --blackText: #111;
     /* dark styles */
-    /* --primaryDarkBackground: #151515; */
-    --primaryDarkBackground: #222222;
-    --secondaryDarkBackground: #2a2a2a;
-    --darkBorder: darkgray;
+    --primaryDarkBackground: #191919;
+    --secondaryDarkBackground: #202122;
+    --darkBorder: #585858;
     --whiteText: #ddd;
 }
 
@@ -28,7 +27,7 @@
 .dark {
     --primaryBackgroundColor: var(--primaryDarkBackground);
     --secondaryBackgroundColor: var(--secondaryDarkBackground);
-    --buttonBackgroundColor: white;
+    --buttonBackgroundColor: var(--primaryBackgroundColor);
     --fontColor: var(--whiteText);
     --borderColor: var(--darkBorder);
 }
@@ -75,6 +74,8 @@ input[type="search"] {
     height: 36px;
     width: 66%;
     -moz-tap-highlight-color: rgba(0, 0, 0, 0.15);
+    background-color: var(--secondaryBackgroundColor);
+    color: var(--fontColor);
 }
 
 input[type="submit"] {
@@ -84,6 +85,7 @@ input[type="submit"] {
     border: 1px solid var(--borderColor);
     border-radius: 5px;
     cursor: pointer;
+    color: var(--fontColor);
 }
 
 input:focus {
@@ -136,6 +138,7 @@ input:focus {
     margin-top: 10px;
     margin-bottom: 10px;
     z-index: 100;
+    color: var(--blackText);
 }
 
 .context-menu-item {
@@ -268,4 +271,13 @@ input:focus {
     bottom: 7.5%;
 }
 
-/* B. How to Use -------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+/* 3. Theme toggle button styles
+/*----------------------------------------------------------------------------*/
+#theme-toggle {
+    font-size: small;
+    position: fixed;
+    right: 15px;
+    bottom: 10px;
+    z-index: 100000;
+}

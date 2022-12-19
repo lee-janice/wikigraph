@@ -47,9 +47,18 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
         y: 0,
     });
 
-    // keep track of theme
-    const [darkMode, setDarkMode] = useState(false);
-    document.body.classList.add("light");
+    // set initial theme and keep track of dark mode state
+    const [darkMode, setDarkMode] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
+    // handle change in dark mode toggle
+    useEffect(() => {
+        if (darkMode) {
+            document.body.classList.add("dark");
+            document.body.classList.remove("light");
+        } else {
+            document.body.classList.add("light");
+            document.body.classList.remove("dark");
+        }
+    }, [darkMode]);
 
     // get reference to selection so that we can use the current value in the vis event listeners
     // otherwise, the value lags behind
@@ -217,21 +226,20 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 }
             >
                 <div id={containerId} ref={ref} />
-                {expandedVis ? (
-                    <img
-                        src="collapse.png"
-                        alt="Collapse visualization button"
-                        className="vis-expand-button"
-                        onClick={() => setExpandedVis(false)}
-                    />
-                ) : (
-                    <img
-                        src="expand.png"
-                        alt="Expand visualization button"
-                        className="vis-expand-button"
-                        onClick={() => setExpandedVis(true)}
-                    />
-                )}
+                <img
+                    src={
+                        expandedVis
+                            ? darkMode
+                                ? "collapse-white.png"
+                                : "collapse.png"
+                            : darkMode
+                            ? "expand-white.png"
+                            : "expand.png"
+                    }
+                    alt={expandedVis ? "Collapse visualization button" : "Expand visualization button"}
+                    className="vis-expand-button"
+                    onClick={() => setExpandedVis(!expandedVis)}
+                />
 
                 <input
                     type="submit"
@@ -258,7 +266,6 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
             {/* sidebar */}
             <div className="sidebar">
                 <NavBar currentNavTab={currentNavTab} setCurrentNavTab={setCurrentNavTab} />
-                {/* <SelectedNodes selectionLabels={selectionLabels} /> */}
                 {currentNavTab === NavTab.Home && (
                     <>
                         <WikipediaSummaries
@@ -285,31 +292,8 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                 {currentNavTab === NavTab.UserManual && <UserManual />}
             </div>
             {/* light/dark mode toggle */}
-            <label
-                style={{
-                    float: "right",
-                    fontSize: "small",
-                    position: "fixed",
-                    right: 15,
-                    bottom: 10,
-                    zIndex: 1000000,
-                }}
-            >
-                <input
-                    type="checkbox"
-                    checked={darkMode}
-                    onChange={(e) => {
-                        setDarkMode(!darkMode);
-                        if (e.target.checked) {
-                            document.body.classList.add("dark");
-                            document.body.classList.remove("light");
-                        } else {
-                            document.body.classList.add("light");
-                            document.body.classList.remove("dark");
-                        }
-                    }}
-                />{" "}
-                Dark mode
+            <label id="theme-toggle">
+                <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} /> Dark mode
             </label>
         </div>
     );
