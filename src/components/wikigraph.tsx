@@ -22,6 +22,7 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
 
     // keep vis object in state
     const [vis, setVis] = useState<NeoVis | null>(null);
+    const [expandedVis, setExpandedVis] = useState(false);
 
     // keep track of selected nodes and labels
     const [selection, setSelection] = useState<IdType[]>([]);
@@ -196,7 +197,21 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
     return (
         <div>
             {/* graph visualization */}
-            <div id="canvas" style={{ height: `80%`, width: `60%`, position: `fixed` }}>
+            <div
+                id="canvas"
+                style={
+                    expandedVis
+                        ? {
+                              top: "0px",
+                              left: "0px",
+                              height: `100%`,
+                              width: `100%`,
+                              position: `fixed`,
+                              zIndex: "100000",
+                          }
+                        : { height: `80%`, width: `60%`, position: `fixed` }
+                }
+            >
                 <div
                     id={containerId}
                     ref={ref}
@@ -208,6 +223,22 @@ const WikiGraph = forwardRef((props: Props, ref: ForwardedRef<HTMLDivElement>) =
                         backgroundColor: `white`,
                     }}
                 />
+                {expandedVis ? (
+                    <img
+                        src="collapse.png"
+                        alt="Collapse visualization button"
+                        className="vis-expand-button"
+                        onClick={() => setExpandedVis(false)}
+                    />
+                ) : (
+                    <img
+                        src="expand.png"
+                        alt="Expand visualization button"
+                        className="vis-expand-button"
+                        onClick={() => setExpandedVis(true)}
+                    />
+                )}
+
                 <input
                     type="submit"
                     value="Stabilize"

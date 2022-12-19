@@ -135,6 +135,7 @@ const ContextMenu: React.FC<Props> = ({
                         </li>
                         <hr />
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
+                            <img src="wikipedia.png" alt="" style={{ height: "1.2em", verticalAlign: "bottom" }} />{" "}
                             Launch Wikipedia page ↗
                         </li>
                     </ul>
@@ -155,6 +156,7 @@ const ContextMenu: React.FC<Props> = ({
                         </li>
                         <hr />
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
+                            <img src="wikipedia.png" alt="" style={{ height: "1.2em", verticalAlign: "bottom" }} />{" "}
                             Launch Wikipedia pages ↗
                         </li>
                     </ul>

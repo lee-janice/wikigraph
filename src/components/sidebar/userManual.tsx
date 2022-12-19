@@ -124,8 +124,8 @@ const UserManual: React.FC = () => {
             context menu provides the user with a couple of different options:
             <ul>
                 <li>
-                    <strong>Create new graph with selection:</strong> this option renders a new graph with the selected
-                    node and all of the nodes that are linked to it.
+                    <strong>Create new graph with selection:</strong> this option renders a new graph containing the
+                    selected node, all of the nodes that are connected to it, and the edges connecting the nodes.
                 </li>
                 <li>
                     <strong>Load summary from Wikipedia:</strong> this option fetches the extract of the article from
