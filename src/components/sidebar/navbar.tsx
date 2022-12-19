@@ -60,10 +60,10 @@ const NavBar: React.FC<Props> = ({ currentNavTab, setCurrentNavTab }) => {
                     )}
                     {currentNavTab === NavTab.UserManual ? (
                         <li onClick={() => setCurrentNavTab(NavTab.UserManual)}>
-                            <u>How To Use</u>
+                            <u>User Manual</u>
                         </li>
                     ) : (
-                        <li onClick={() => setCurrentNavTab(NavTab.UserManual)}>How To Use</li>
+                        <li onClick={() => setCurrentNavTab(NavTab.UserManual)}>User Manual</li>
                     )}
                 </ul>
             </StyledNav>
