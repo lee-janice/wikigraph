@@ -113,7 +113,7 @@ const UserManual: React.FC = () => {
             <h2>Context menu</h2>
             <p>
                 For now, most of the interaction with the application is accomplished through right-clicking on the
-                visualization. This action opens up the context menu, which lists different options based on what was
+                visualization. This action opens up the context menu*, which lists different options based on what was
                 underneath the cursor and what was selected on the visualization (i.e., its <em>context</em>). There are
                 currently three contexts: <code>Node</code>, <code>Nodes</code>, and <code>Canvas</code>.
             </p>
@@ -151,6 +151,11 @@ const UserManual: React.FC = () => {
             This context is activated when there is no node underneath the cursor, i.e., when the canvas is selected. It
             currently has only one option, which is to <strong>Open image in new tab</strong>. This option opens an
             image of the rendered graph in a new tab so that you can export it.
+            <hr />
+            <span style={{ fontSize: "0.85em" }}>
+                *On mobile, you can open up the context menu by clicking the options button (three vertical dots) on the
+                top right of the visualization.
+            </span>
             {/* Search bar */}
             <h2>Search bar</h2>
             <p>

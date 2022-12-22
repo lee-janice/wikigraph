@@ -74,13 +74,15 @@ const WikiGraph: React.FC<Props> = ({
 }) => {
     // keep vis object in state
     const [vis, setVis] = useState<NeoVis | null>(null);
-    const [expandedVis, setExpandedVis] = useState(false);
+    const [visIsExpanded, setVisIsExpanded] = useState(false);
 
     // keep track of selected nodes and labels
+    // TODO: combine into one object
     const [selection, setSelection] = useState<IdType[]>([]);
     const [selectionLabels, setSelectionLabels] = useState([""]);
 
     // keep track of summaries
+    // TODO: combine into one object
     const [summaries, setSummaries] = useState<WikiSummary[]>([]);
     const [currentSummary, setCurrentSummary] = useState<WikiSummary | null>(null);
 
@@ -95,9 +97,21 @@ const WikiGraph: React.FC<Props> = ({
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
         open: false,
         type: ContextMenuType.Canvas,
+        mobile: window.innerWidth < 1100,
         x: 0,
         y: 0,
     });
+    window.onresize = () => {
+        if (window.innerWidth < 1100) {
+            if (!contextMenuState.mobile) {
+                setContextMenuState({ ...contextMenuState, mobile: true });
+            }
+        } else {
+            if (contextMenuState.mobile) {
+                setContextMenuState({ ...contextMenuState, mobile: false });
+            }
+        }
+    };
 
     // get reference to selection so that we can use the current value in the vis event listeners
     // otherwise, the value lags behind
@@ -184,7 +198,13 @@ const WikiGraph: React.FC<Props> = ({
 
             // 2. listener for "click"
             vis.network?.on("click", (e) => {
-                setContextMenuState({ open: false, type: ContextMenuType.Canvas, x: 0, y: 0 });
+                setContextMenuState({
+                    open: false,
+                    type: ContextMenuType.Canvas,
+                    mobile: window.innerWidth < 1100,
+                    x: 0,
+                    y: 0,
+                });
             });
 
             // 3. listener for "double click"
@@ -223,7 +243,13 @@ const WikiGraph: React.FC<Props> = ({
                     type = ContextMenuType.Canvas;
                 }
 
-                setContextMenuState({ open: true, type: type, x: correctedX, y: correctedY });
+                setContextMenuState({
+                    open: true,
+                    type: type,
+                    mobile: window.screen.width < 1100,
+                    x: correctedX,
+                    y: correctedY,
+                });
             });
         });
     }, [containerId, serverDatabase, serverURI, serverUser, serverPassword]);
@@ -250,11 +276,11 @@ const WikiGraph: React.FC<Props> = ({
     return (
         <>
             {/* graph visualization */}
-            <StyledCanvas theme={{ expanded: expandedVis }} id="canvas">
+            <StyledCanvas theme={{ expanded: visIsExpanded }} id="canvas">
                 <div id={containerId} />
                 <img
                     src={
-                        expandedVis
+                        visIsExpanded
                             ? darkMode
                                 ? "icons/collapse-white.png"
                                 : "icons/collapse.png"
@@ -262,11 +288,36 @@ const WikiGraph: React.FC<Props> = ({
                             ? "icons/expand-white.png"
                             : "icons/expand.png"
                     }
-                    alt={expandedVis ? "Collapse visualization button" : "Expand visualization button"}
+                    alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
                     className="vis-expand-button"
-                    onClick={() => setExpandedVis(!expandedVis)}
+                    onClick={() => setVisIsExpanded(!visIsExpanded)}
                 />
-
+                {contextMenuState.mobile && (
+                    <img
+                        src={
+                            contextMenuState.open
+                                ? darkMode
+                                    ? "icons/close-white.png"
+                                    : "icons/close.png"
+                                : darkMode
+                                ? "icons/kebab-white.png"
+                                : "icons/kebab.png"
+                        }
+                        alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
+                        className="mobile-context-button"
+                        onClick={() => {
+                            var type;
+                            if (selection.length === 0) {
+                                type = ContextMenuType.Canvas;
+                            } else if (selection.length === 1) {
+                                type = ContextMenuType.Node;
+                            } else {
+                                type = ContextMenuType.Nodes;
+                            }
+                            setContextMenuState({ ...contextMenuState, open: !contextMenuState.open, type: type });
+                        }}
+                    />
+                )}
                 <input
                     type="submit"
                     value="Stabilize"

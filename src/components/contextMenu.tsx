@@ -14,6 +14,7 @@ export enum ContextMenuType {
 export type ContextMenuState = {
     open: boolean;
     type: ContextMenuType;
+    mobile: boolean;
     x: number;
     y: number;
 };
@@ -50,8 +51,9 @@ const ContextMenu: React.FC<Props> = ({
         : {
               // https://stackoverflow.com/questions/70206356/makestyles-throwing-error-using-typescript
               position: `absolute` as `absolute`,
-              left: state.x,
-              top: state.y,
+              left: state.mobile ? `undefined` : state.x,
+              right: state.mobile ? `10px` : `undefined`,
+              top: state.mobile ? `92px` : state.y,
               border: `1px solid var(--borderColor)`,
               fontSize: `small`,
               borderRadius: `5px`,
@@ -100,7 +102,6 @@ const ContextMenu: React.FC<Props> = ({
             })
         );
         setSummaries(s);
-
         // close context menu
         setState({ ...state, open: false });
     };
@@ -108,7 +109,6 @@ const ContextMenu: React.FC<Props> = ({
     // ----- event handler for "Delete nodes" context menu selection -----
     const handleDeleteNode = () => {
         vis?.network?.deleteSelected();
-
         // close context menu
         setState({ ...state, open: false });
     };

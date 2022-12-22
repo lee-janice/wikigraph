@@ -131,7 +131,20 @@ input:focus {
     top: 0px;
     right: 0px;
     margin: 10px 10px;
-    height: 2em;
+    height: 32px;
+    cursor: pointer;
+    background-color: var(--buttonBackgroundColor);
+    border: 1px solid var(--borderColor);
+    border-radius: 5px;
+}
+
+.mobile-context-button {
+    position: absolute;
+    top: 40px;
+    right: 0px;
+    margin: 10px 10px;
+    padding: -5px -5px;
+    height: 32px;
     cursor: pointer;
     background-color: var(--buttonBackgroundColor);
     border: 1px solid var(--borderColor);
@@ -276,10 +289,4 @@ input:focus {
     right: 15px;
     bottom: 10px;
     z-index: 100000;
-}
-
-/*----------------------------------------------------------------------------*/
-/* 4. Smaller screens
-/*----------------------------------------------------------------------------*/
-@media (max-width: 760px) {
 }
