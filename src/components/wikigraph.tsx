@@ -118,6 +118,7 @@ const WikiGraph: React.FC<Props> = ({
     const selectionRef = useRef(selection);
 
     // ----- initialize visualization and neovis object -----
+    // TODO: maybe export to util file?
     useEffect(() => {
         var config: NeovisConfig = {
             containerId: containerId,

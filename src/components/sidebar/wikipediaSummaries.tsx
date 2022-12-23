@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction } from "react";
 export type WikiSummary = {
     title: string;
     text: string;
+    link: string;
 };
 
 interface Props {
@@ -53,7 +54,11 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
                     })}
                 </div>
                 <div className="wikipedia-summary">
-                    <h1>{currentSummary.title}</h1>
+                    <h1>
+                        <a href={currentSummary.link} target="_blank" style={{ textDecoration: `none` }}>
+                            {currentSummary.title} <span style={{ fontSize: `16px` }}>↗</span>
+                        </a>
+                    </h1>
                     {/* // TODO: need to escape math elements: e.g. in the "Dark energy" summary */}
                     {currentSummary.text.split("\n").map((text, i) => {
                         return (

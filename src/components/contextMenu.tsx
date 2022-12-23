@@ -92,6 +92,7 @@ const ContextMenu: React.FC<Props> = ({
                     const summary = {
                         title: result.title,
                         text: await getWikipediaExtract(result.pageid),
+                        link: await getWikipediaLink(result.pageid),
                     };
                     // if it is the first summary generated so far, set it to the current summary
                     if (s.length === 0) {
