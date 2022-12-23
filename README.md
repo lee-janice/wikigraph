@@ -38,16 +38,24 @@ Index
 -   [x] Add alternative to context menu on mobile
 -   [x] Add link to Wikipedia page on the summaries
 -   [x] Allow user to double click node to expand the links
--   [ ] Allow user to add nodes to existing graph
+-   [x] Allow user to add nodes to existing graph
+-   [ ] Delete all unconnected nodes
+-   [ ] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
 -   [ ] Adjust it so that newly spawned nodes spawn near the clicked nodes
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Add keep selected nodes to context menu
 -   [ ] Notify user when article is not found in the database
+-   [ ] Maybe change the color of in-going and out-going links when selecting a node? Have to think about case where two connected nodes are selected; maybe only allows this when one node is selected
+
+#### Clean up code
+
 -   [ ] Refactor component/file structure
+-   [ ] Use styled components instead of css file for one-offs
 
 ### Longer-term modifications
 
 -   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
+-   [ ] holy crap the performance for expanding a node is awful
 -   [ ] Implement cache for summaries and links
 -   [ ] Add something like Elastic Search to Wikipedia articles
 -   [ ] Allow user to save/export and load graphs

@@ -88,7 +88,7 @@ input[type="search"] {
 }
 
 input[type="submit"] {
-    margin: 5px 5px;
+    margin: 0px 5px;
     padding: 10px 5px;
     background-color: var(--buttonBackgroundColor);
     border: 1px solid var(--borderColor);
@@ -274,7 +274,6 @@ input:focus {
 /* ----- search bar ----- */
 .search-bar {
     float: left;
-    margin: 2% 4.5%;
     width: 95%;
     position: absolute;
     bottom: 5%;

@@ -88,7 +88,6 @@ const WikiGraph: React.FC<Props> = ({
 
     // keep track of search bar input
     const [input, setInput] = useState("");
-    const [search, setSearch] = useState("Universe");
 
     // keep track of nav bar tab state
     const [currentNavTab, setCurrentNavTab] = useState<NavTab>(NavTab.Home);
@@ -267,23 +266,30 @@ const WikiGraph: React.FC<Props> = ({
     }, [containerId, serverDatabase, serverURI, serverUser, serverPassword]);
 
     // ----- execute cypher query when user inputs search, update visualization -----
-    useEffect(() => {
+    const createNewGraph = () => {
         // TODO: replace this with something that does not open the DB up to an injection attack
         var cypher =
             'CALL { MATCH (p:Page) WHERE apoc.text.levenshteinSimilarity(p.title, "' +
-            search +
+            input +
             '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
-            search +
+            input +
             '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
 
         // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
-        if (cypher.length > 0) {
-            vis?.renderWithCypher(cypher);
-            vis?.network?.moveTo({ position: { x: 0, y: 0 } });
-        } else {
-            vis?.reload();
-        }
-    }, [search, vis]);
+        vis?.renderWithCypher(cypher);
+        vis?.network?.moveTo({ position: { x: 0, y: 0 } });
+    };
+
+    const addToGraph = () => {
+        var cypher =
+            'CALL { MATCH (p:Page) WHERE apoc.text.levenshteinSimilarity(p.title, "' +
+            input +
+            '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
+            input +
+            '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
+        vis?.updateWithCypher(cypher);
+        vis?.network?.moveTo({ position: { x: 0, y: 0 } });
+    };
 
     return (
         <>
@@ -368,13 +374,15 @@ const WikiGraph: React.FC<Props> = ({
                         <div className="search-bar">
                             Search for a Wikipedia article:
                             <br />
-                            <form id="search" action="#" onSubmit={() => setSearch(input)}>
+                            <form id="search" onSubmit={() => createNewGraph}>
                                 <input
                                     type="search"
                                     placeholder="Article title"
                                     onChange={(e) => setInput(e.target.value)}
                                 />
-                                <input type="submit" value="Submit" onClick={() => setSearch(input)} />
+                                <br />
+                                <input type="submit" value="Create new graph" onClick={createNewGraph} />
+                                <input type="submit" value="Add to graph" onClick={addToGraph} />
                             </form>
                         </div>
                     </>
