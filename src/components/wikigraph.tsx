@@ -157,11 +157,10 @@ const WikiGraph: React.FC<Props> = ({
                         gravitationalConstant: -20000,
                         damping: 0.5,
                     },
-                    stabilization: {
-                        iterations: 100,
-                    },
+                    // stabilization: {
+                    //     iterations: 100,
+                    // },
                     maxVelocity: 5,
-                    timestep: 0.25,
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
                 layout: { randomSeed: 1337 },
