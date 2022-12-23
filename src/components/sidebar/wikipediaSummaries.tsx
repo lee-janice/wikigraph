@@ -59,7 +59,7 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
                             {currentSummary.title} <span style={{ fontSize: `16px` }}>↗</span>
                         </a>
                     </h1>
-                    {/* // TODO: need to escape math elements: e.g. in the "Dark energy" summary */}
+                    {/* // TODO: need to escape math elements: e.g. the "Dark energy" summary */}
                     {currentSummary.text.split("\n").map((text, i) => {
                         return (
                             <p key={i} style={{ whiteSpace: "pre-line" }}>
