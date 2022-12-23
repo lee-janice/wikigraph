@@ -55,7 +55,12 @@ const WikipediaSummaries: React.FC<Props> = ({ summaries, setSummaries, currentS
                 </div>
                 <div className="wikipedia-summary">
                     <h1>
-                        <a href={currentSummary.link} target="_blank" style={{ textDecoration: `none` }}>
+                        <a
+                            href={currentSummary.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ textDecoration: `none` }}
+                        >
                             {currentSummary.title} <span style={{ fontSize: `16px` }}>↗</span>
                         </a>
                     </h1>

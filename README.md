@@ -40,6 +40,7 @@ Index
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Add keep selected nodes to context menu
 -   [ ] Notify user when article is not found in the database
+-   [ ] Refactor component/file structure
 
 ### Longer-term modifications
 

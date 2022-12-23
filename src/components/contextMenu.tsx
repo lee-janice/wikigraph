@@ -103,6 +103,7 @@ const ContextMenu: React.FC<Props> = ({
             })
         );
         setSummaries(s);
+        setCurrentSummary(s[0]);
         // close context menu
         setState({ ...state, open: false });
     };
