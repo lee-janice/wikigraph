@@ -77,6 +77,10 @@ const UserManual: React.FC = () => {
             </p>
             {/* Interacting with the graph */}
             <h2>Interacting with the graph</h2>
+            <h3>Adding nodes to the graph</h3>
+            You can expand a node by <strong>double-clicking on it</strong>. The graph will update with all of the nodes
+            linked to that node in the database.
+            <h3>Changing the display of the graph</h3>
             You can change the display of the graph in a variety of ways:
             <ul>
                 <li>
@@ -98,6 +102,7 @@ const UserManual: React.FC = () => {
                     wish it to be in. <em>C'est la vie!</em>
                 </li>
             </ul>
+            <h3>Selecting nodes in the graph</h3>
             You can also select nodes in the graph:
             <ul>
                 <li>

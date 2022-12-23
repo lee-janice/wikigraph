@@ -157,7 +157,11 @@ const WikiGraph: React.FC<Props> = ({
                         gravitationalConstant: -20000,
                         damping: 0.5,
                     },
+                    stabilization: {
+                        iterations: 100,
+                    },
                     maxVelocity: 5,
+                    timestep: 0.25,
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
                 layout: { randomSeed: 1337 },
@@ -209,15 +213,21 @@ const WikiGraph: React.FC<Props> = ({
             });
 
             // 3. listener for "double click"
-            vis.network?.on("doubleClick", (e) => {
-                console.log(e);
-                console.log("doubleClicked");
+            vis.network?.on("doubleClick", (click) => {
+                // if there's a node under the cursor, update visualization with its links
+                if (click.nodes.length > 0) {
+                    const nodeId = click.nodes[0];
+                    console.log(nodeId);
+                    var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
+                    vis?.updateWithCypher(cypher);
+                }
             });
 
             // 4. listener for "right click"
             vis.network?.on("oncontext", (click) => {
                 click.event.preventDefault();
 
+                // TODO: figure out why click.nodes is not accurate on right click
                 // get adjusted coordinates to place the context menu
                 var rect = click.event.target.getBoundingClientRect();
                 let correctedX = click.event.x - rect.x;
@@ -226,6 +236,8 @@ const WikiGraph: React.FC<Props> = ({
                 var type = ContextMenuType.Canvas;
                 // check if there's a node under the cursor
                 var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
+                console.log(nodeId);
+                console.log(correctedX, correctedY);
                 if (nodeId) {
                     // select node that was right-clicked
                     if (selectionRef.current) {

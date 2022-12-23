@@ -10,18 +10,18 @@ A non-linear, graph-based approach to exploring the depths of Wikipedia
 Index
 └── App
     ├── Wikigraph
-    |   └── Canvas
-    |       └── Graph visualization
-    |       └── Expand visualization button
-    |       └── *Mobile context menu button*
-    |       └── Stabilize button
-    |       └── Center button
-    |       └── *Context menu*
+    |   ├── Canvas
+    |   |   └── Graph visualization
+    |   |   └── Expand visualization button
+    |   |   └── *Mobile context menu button*
+    |   |   └── Stabilize button
+    |   |   └── Center button
+    |   |   └── *Context menu*
     |   └── Sidebar
     |       └── Home tab
     |       └── About tab
     |       └── User manual tab
-    ├── Theme toggler
+    └── Theme toggler
 ```
 
 ## TODOs
@@ -37,6 +37,9 @@ Index
 -   [x] Fix formatting on mobile
 -   [x] Add alternative to context menu on mobile
 -   [x] Add link to Wikipedia page on the summaries
+-   [x] Allow user to double click node to expand the links
+-   [ ] Allow user to add nodes to existing graph
+-   [ ] Adjust it so that newly spawned nodes spawn near the clicked nodes
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Add keep selected nodes to context menu
 -   [ ] Notify user when article is not found in the database
@@ -45,11 +48,10 @@ Index
 ### Longer-term modifications
 
 -   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
--   [ ] If possible, allow user to double click node to expand the links
--   [ ] If possible, allow user to add nodes to existing graph
 -   [ ] Implement cache for summaries and links
 -   [ ] Add something like Elastic Search to Wikipedia articles
 -   [ ] Allow user to save/export and load graphs
+-   [ ] Allow user to click and drag to select all nodes inside an area
 
 ## Build
 
