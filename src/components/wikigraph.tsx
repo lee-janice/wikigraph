@@ -274,7 +274,6 @@ const WikiGraph: React.FC<Props> = ({
             '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
             input +
             '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
-        console.log(cypher);
         // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
         vis?.renderWithCypher(cypher);
         vis?.network?.moveTo({ position: { x: 0, y: 0 } });
