@@ -373,8 +373,7 @@ const WikiGraph: React.FC<Props> = ({
                         <div className="search-bar">
                             Search for a Wikipedia article:
                             <br />
-                            {/* <form id="search" action="#" onSubmit={() => createNewGraph}> */}
-                            <form id="search" onSubmit={() => createNewGraph}>
+                            <form id="search" action="#" onSubmit={() => createNewGraph}>
                                 <input
                                     type="search"
                                     placeholder="Article title"
