@@ -156,9 +156,9 @@ const WikiGraph: React.FC<Props> = ({
                         gravitationalConstant: -20000,
                         damping: 0.5,
                     },
-                    // stabilization: {
-                    //     iterations: 100,
-                    // },
+                    stabilization: {
+                        iterations: 100,
+                    },
                     maxVelocity: 5,
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
@@ -215,7 +215,6 @@ const WikiGraph: React.FC<Props> = ({
                 // if there's a node under the cursor, update visualization with its links
                 if (click.nodes.length > 0) {
                     const nodeId = click.nodes[0];
-                    console.log(nodeId);
                     var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
                     vis?.updateWithCypher(cypher);
                 }
@@ -234,8 +233,6 @@ const WikiGraph: React.FC<Props> = ({
                 var type = ContextMenuType.Canvas;
                 // check if there's a node under the cursor
                 var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
-                console.log(nodeId);
-                console.log(correctedX, correctedY);
                 if (nodeId) {
                     // select node that was right-clicked
                     if (selectionRef.current) {

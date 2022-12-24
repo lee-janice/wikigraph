@@ -54,12 +54,13 @@ Index
 
 ### Longer-term modifications
 
--   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
 -   [ ] holy crap the performance for expanding a node is awful
+-   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
 -   [ ] Implement cache for summaries and links
 -   [ ] Add something like Elastic Search to Wikipedia articles
 -   [ ] Allow user to save/export and load graphs
 -   [ ] Allow user to click and drag to select all nodes inside an area
+-   [ ] Make an excerpt of the summary (first sentence) appear on hovering over a node
 
 ## Build
 
