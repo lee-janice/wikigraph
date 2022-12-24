@@ -157,7 +157,7 @@ const WikiGraph: React.FC<Props> = ({
                         damping: 0.5,
                     },
                     stabilization: {
-                        iterations: 100,
+                        iterations: 250,
                     },
                     maxVelocity: 5,
                 },
@@ -370,7 +370,14 @@ const WikiGraph: React.FC<Props> = ({
                         <div className="search-bar">
                             Search for a Wikipedia article:
                             <br />
-                            <form id="search" action="#" onSubmit={() => createNewGraph}>
+                            <form
+                                id="search"
+                                action="#"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    createNewGraph();
+                                }}
+                            >
                                 <input
                                     type="search"
                                     placeholder="Article title"
