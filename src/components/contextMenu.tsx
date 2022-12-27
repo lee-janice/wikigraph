@@ -110,7 +110,25 @@ const ContextMenu: React.FC<Props> = ({
 
     // ----- event handler for "Delete nodes" context menu selection -----
     const handleDeleteNode = () => {
+        // get array of all nodes connected to the nodes to delete
+        const selection = vis?.network?.getSelectedNodes();
+        var connected: Array<any> = [];
+        selection?.forEach((sId) => {
+            connected = connected.concat(vis?.network?.getConnectedNodes(sId));
+        });
+
+        // delete selected nodes
         vis?.network?.deleteSelected();
+
+        // for each connected node, check if it is detached, and delete if so
+        connected?.forEach((cId) => {
+            // have to get around the weird typing of .getConnectedNodes
+            if (typeof cId === "string" || typeof cId === "number") {
+                if (vis?.network?.getConnectedNodes(cId).length === 0) {
+                    vis?.nodes.remove(cId);
+                }
+            }
+        });
         // close context menu
         setState({ ...state, open: false });
     };

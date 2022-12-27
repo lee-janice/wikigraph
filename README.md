@@ -39,7 +39,7 @@ Index
 -   [x] Add link to Wikipedia page on the summaries
 -   [x] Allow user to double click node to expand the links
 -   [x] Allow user to add nodes to existing graph
--   [ ] Delete all unconnected nodes
+-   [x] Delete all unconnected nodes
 -   [ ] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
 -   [ ] Adjust it so that newly spawned nodes spawn near the clicked nodes
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
