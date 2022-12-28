@@ -138,34 +138,41 @@ const WikiGraph: React.FC<Props> = ({
             // https://visjs.github.io/vis-network/docs/network/#options
             visConfig: {
                 nodes: {
-                    shape: "circle",
+                    shape: "dot",
+                    borderWidth: 1.5,
                     color: {
                         background: "lightgray",
                         border: "gray",
                         highlight: {
+                            border: "#a42a04",
                             background: "lightgray",
-                            border: "gray",
                         },
+                    },
+                    font: {
+                        strokeWidth: 7.5,
                     },
                 },
                 edges: { arrows: { to: { enabled: true } } },
                 physics: {
-                    // uses the Barnes-Hut algorithm to compute node positions
-                    barnesHut: {
-                        avoidOverlap: 1, // value between 0 and 1, 1 is maximum overlap avoidance
-                        gravitationalConstant: -20000,
-                        damping: 0.5,
+                    enabled: true,
+                    // use the forceAtlas2Based solver to compute node positions
+                    solver: "forceAtlas2Based",
+                    forceAtlas2Based: {
+                        gravitationalConstant: -75,
+                    },
+                    repulsion: {
+                        centralGravity: 0.01,
+                        springLength: 200,
                     },
                     stabilization: {
                         iterations: 250,
                     },
-                    maxVelocity: 5,
                 },
                 interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
                 layout: { randomSeed: 1337 },
             },
             // node and edge settings
-            labels: { Page: { label: "title", size: "clicksInto" } },
+            labels: { Page: { label: "title", value: "clicksInto" } },
             relationships: { LINKS_TO: { value: "quantity" } },
             initialCypher:
                 "MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = 'Universe' RETURN p1, l, p2 ORDER BY l.quantity",
@@ -200,7 +207,7 @@ const WikiGraph: React.FC<Props> = ({
             });
 
             // 2. listener for "click"
-            vis.network?.on("click", (e) => {
+            vis.network?.on("click", (click) => {
                 setContextMenuState({
                     open: false,
                     type: ContextMenuType.Canvas,

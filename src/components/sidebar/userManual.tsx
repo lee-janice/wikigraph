@@ -73,7 +73,7 @@ const UserManual: React.FC = () => {
             </p>
             <p>
                 The size of the node corresponds to the total number of clicks into that article; so of the displayed
-                nodes, users clicked most frequently into <em>Ultimate fate of the universe</em>.
+                nodes, users clicked most frequently into <em>Science</em>.
             </p>
             {/* Interacting with the graph */}
             <h2>Interacting with the graph</h2>

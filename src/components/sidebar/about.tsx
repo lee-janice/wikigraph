@@ -56,21 +56,21 @@ const About: React.FC = () => {
                 with the value of the edge being the number of clicks from the source to the target.
             </p>
             <p>
-                In the visualization, each node represents a Wikipedia article in the dataset and each edge represents a
-                clickstream link between the source and target articles. For example, the default graph demonstrates
-                that users click from <em>Science</em> → <em>Universe</em>, and also from <em>Universe</em> →{" "}
-                <em>Ultimate fate of the universe</em>. Users click both from <em>Universe</em> →{" "}
-                <em>Observable universe</em> and from <em>Observable universe</em> → <em>Universe</em>.
+                In the visualization, <strong>each node</strong> represents a Wikipedia article in the dataset and{" "}
+                <strong>each edge</strong> represents a clickstream link between the source and target articles. For
+                example, the default graph demonstrates that users click from <em>Science</em> → <em>Universe</em>, and
+                also from <em>Universe</em> → <em>Ultimate fate of the universe</em>. Users click both from{" "}
+                <em>Universe</em> → <em>Observable universe</em> and from <em>Observable universe</em> →{" "}
+                <em>Universe</em>.
             </p>
             <p>
-                The weight of an edge in the visualization depends on the number of clicks between the source and
-                target: more clicks means a thicker edge. Thus, users clicked more from <em>Universe</em> →{" "}
+                The <strong>weight of an edge</strong> in the visualization depends on the number of clicks between the
+                source and target: more clicks means a thicker edge. Thus, users clicked more from <em>Universe</em> →{" "}
                 <em>Big Bang</em> than from <em>Universe</em> → <em>Planet</em>.
             </p>
             <p>
-                The size of a node depends on the total number of clicks into that article. Thus, the article that was
-                most clicked-into in the default graph is <em>Ultimate fate of the universe</em>, and the article that
-                was least clicked-into is <em>Time</em>.
+                The <strong>size of a node</strong> depends on the total number of clicks into that article. Thus, the
+                article that was most clicked-into from <em>any other Wikipedia article</em> is <em>Science</em>.
             </p>
             <hr />
             <span style={{ fontSize: "0.85em" }}>
