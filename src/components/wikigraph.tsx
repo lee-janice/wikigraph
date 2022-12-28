@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import NeoVis, { NeovisConfig, NeoVisEvents } from "neovis.js/dist/neovis.js";
+import NeoVis, { NeoVisEvents } from "neovis.js/dist/neovis.js";
 import ContextMenu, { ContextMenuState, ContextMenuType } from "./contextMenu";
 import NavBar, { NavTab } from "./sidebar/navbar";
 import UserManual from "./sidebar/userManual";
 import About from "./sidebar/about";
 import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
+import { createConfig } from "../util/neo4jConfig";
 
 const StyledCanvas = styled.div`
     height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
@@ -119,65 +120,7 @@ const WikiGraph: React.FC<Props> = ({
     // ----- initialize visualization and neovis object -----
     // TODO: maybe export to util file?
     useEffect(() => {
-        var config: NeovisConfig = {
-            containerId: containerId,
-            // neo4j database connection settings
-            serverDatabase: serverDatabase, // specify which database to read from
-            neo4j: {
-                serverUrl: serverURI,
-                serverUser: serverUser,
-                serverPassword: serverPassword,
-                driverConfig: {
-                    // enforce encryption
-                    // https://stackoverflow.com/questions/71719427/how-to-visualize-remote-neo4j-auradb-with-neovis-js
-                    encrypted: "ENCRYPTION_ON",
-                    trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
-                },
-            },
-            // override the default vis.js settings
-            // https://visjs.github.io/vis-network/docs/network/#options
-            visConfig: {
-                nodes: {
-                    shape: "dot",
-                    borderWidth: 1.5,
-                    color: {
-                        background: "lightgray",
-                        border: "gray",
-                        highlight: {
-                            border: "#a42a04",
-                            background: "lightgray",
-                        },
-                    },
-                    font: {
-                        strokeWidth: 7.5,
-                    },
-                },
-                edges: { arrows: { to: { enabled: true } } },
-                physics: {
-                    enabled: true,
-                    // use the forceAtlas2Based solver to compute node positions
-                    solver: "forceAtlas2Based",
-                    forceAtlas2Based: {
-                        gravitationalConstant: -75,
-                    },
-                    repulsion: {
-                        centralGravity: 0.01,
-                        springLength: 200,
-                    },
-                    stabilization: {
-                        iterations: 250,
-                    },
-                },
-                interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
-                layout: { randomSeed: 1337 },
-            },
-            // node and edge settings
-            labels: { Page: { label: "title", value: "clicksInto" } },
-            relationships: { LINKS_TO: { value: "quantity" } },
-            initialCypher:
-                "MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = 'Universe' RETURN p1, l, p2 ORDER BY l.quantity",
-        };
-        const vis: NeoVis = new NeoVis(config);
+        const vis = createConfig(containerId, serverDatabase, serverURI, serverUser, serverPassword);
         vis.render();
         setVis(vis);
 
