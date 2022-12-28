@@ -117,6 +117,9 @@ const WikiGraph: React.FC<Props> = ({
     // otherwise, the value lags behind
     const selectionRef = useRef(selection);
 
+    // so that we only register event listeners once
+    const completionRef = useRef(false);
+
     // ----- initialize visualization and neovis object -----
     // TODO: maybe export to util file?
     useEffect(() => {
@@ -125,90 +128,94 @@ const WikiGraph: React.FC<Props> = ({
         setVis(vis);
 
         // create event listeners once the visualization is rendered
-        vis?.registerOnEvent(NeoVisEvents.CompletionEvent, () => {
-            const updateSelectionState = (nodeIds: IdType[]) => {
-                // update selection
-                setSelection(nodeIds);
-                selectionRef.current = nodeIds;
+        vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
+            if (!completionRef.current) {
+                completionRef.current = true;
 
-                // update selection labels
-                var labels = vis.nodes
-                    .get()
-                    .filter((node: any) => (nodeIds ? nodeIds.includes(node.id) : ""))
-                    .map(({ label }: { label?: any }) => {
-                        return label;
-                    });
-                setSelectionLabels(labels);
-            };
+                const updateSelectionState = (nodeIds: IdType[]) => {
+                    // update selection
+                    setSelection(nodeIds);
+                    selectionRef.current = nodeIds;
 
-            // 1. listener for "select"
-            vis.network?.on("select", (e) => {
-                var nodeIds = vis.network?.getSelectedNodes();
-                if (nodeIds) {
-                    updateSelectionState(nodeIds);
-                }
-            });
+                    // update selection labels
+                    var labels = vis.nodes
+                        .get()
+                        .filter((node: any) => (nodeIds ? nodeIds.includes(node.id) : ""))
+                        .map(({ label }: { label?: any }) => {
+                            return label;
+                        });
+                    setSelectionLabels(labels);
+                };
 
-            // 2. listener for "click"
-            vis.network?.on("click", (click) => {
-                setContextMenuState({
-                    open: false,
-                    type: ContextMenuType.Canvas,
-                    mobile: window.innerWidth < 1100,
-                    x: 0,
-                    y: 0,
-                });
-            });
-
-            // 3. listener for "double click"
-            vis.network?.on("doubleClick", (click) => {
-                // if there's a node under the cursor, update visualization with its links
-                if (click.nodes.length > 0) {
-                    const nodeId = click.nodes[0];
-                    var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
-                    vis?.updateWithCypher(cypher);
-                }
-            });
-
-            // 4. listener for "right click"
-            vis.network?.on("oncontext", (click) => {
-                click.event.preventDefault();
-
-                // TODO: figure out why click.nodes is not accurate on right click
-                // get adjusted coordinates to place the context menu
-                var rect = click.event.target.getBoundingClientRect();
-                let correctedX = click.event.x - rect.x;
-                let correctedY = click.event.y - rect.y;
-
-                var type = ContextMenuType.Canvas;
-                // check if there's a node under the cursor
-                var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
-                if (nodeId) {
-                    // select node that was right-clicked
-                    if (selectionRef.current) {
-                        vis.network?.selectNodes([...selectionRef.current, nodeId]);
-                    } else {
-                        vis.network?.selectNodes([nodeId]);
-                    }
-
-                    // update selection state
-                    const nodeIds = vis.network?.getSelectedNodes();
+                // 1. listener for "select"
+                vis.network?.on("select", (e) => {
+                    var nodeIds = vis.network?.getSelectedNodes();
                     if (nodeIds) {
                         updateSelectionState(nodeIds);
-                        nodeIds.length > 1 ? (type = ContextMenuType.Nodes) : (type = ContextMenuType.Node);
                     }
-                } else {
-                    type = ContextMenuType.Canvas;
-                }
-
-                setContextMenuState({
-                    open: true,
-                    type: type,
-                    mobile: window.screen.width < 1100,
-                    x: correctedX,
-                    y: correctedY,
                 });
-            });
+
+                // 2. listener for "click"
+                vis.network?.on("click", (click) => {
+                    setContextMenuState({
+                        open: false,
+                        type: ContextMenuType.Canvas,
+                        mobile: window.innerWidth < 1100,
+                        x: 0,
+                        y: 0,
+                    });
+                });
+
+                // 3. listener for "double click"
+                vis.network?.on("doubleClick", (click) => {
+                    // if there's a node under the cursor, update visualization with its links
+                    if (click.nodes.length > 0) {
+                        const nodeId = click.nodes[0];
+                        var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
+                        vis?.updateWithCypher(cypher);
+                    }
+                });
+
+                // 4. listener for "right click"
+                vis.network?.on("oncontext", (click) => {
+                    click.event.preventDefault();
+
+                    // TODO: figure out why click.nodes is not accurate on right click
+                    // get adjusted coordinates to place the context menu
+                    var rect = click.event.target.getBoundingClientRect();
+                    let correctedX = click.event.x - rect.x;
+                    let correctedY = click.event.y - rect.y;
+
+                    var type = ContextMenuType.Canvas;
+                    // check if there's a node under the cursor
+                    var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
+                    if (nodeId) {
+                        // select node that was right-clicked
+                        if (selectionRef.current) {
+                            vis.network?.selectNodes([...selectionRef.current, nodeId]);
+                        } else {
+                            vis.network?.selectNodes([nodeId]);
+                        }
+
+                        // update selection state
+                        const nodeIds = vis.network?.getSelectedNodes();
+                        if (nodeIds) {
+                            updateSelectionState(nodeIds);
+                            nodeIds.length > 1 ? (type = ContextMenuType.Nodes) : (type = ContextMenuType.Node);
+                        }
+                    } else {
+                        type = ContextMenuType.Canvas;
+                    }
+
+                    setContextMenuState({
+                        open: true,
+                        type: type,
+                        mobile: window.screen.width < 1100,
+                        x: correctedX,
+                        y: correctedY,
+                    });
+                });
+            }
         });
     }, [containerId, serverDatabase, serverURI, serverUser, serverPassword]);
 

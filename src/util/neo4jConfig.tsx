@@ -7,7 +7,6 @@ export const createConfig = (
     serverUser: string,
     serverPassword: string
 ) => {
-    console.log("fired");
     var config: NeovisConfig = {
         containerId: containerId,
         // neo4j database connection settings
