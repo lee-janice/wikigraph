@@ -370,23 +370,14 @@ const WikiGraph: React.FC<Props> = ({
                         <div className="search-bar">
                             Search for a Wikipedia article:
                             <br />
-                            <form
-                                id="search"
-                                action="#"
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    createNewGraph();
-                                }}
-                            >
-                                <input
-                                    type="search"
-                                    placeholder="Article title"
-                                    onChange={(e) => setInput(e.target.value)}
-                                />
-                                <br />
-                                <input type="submit" value="Create new graph" onClick={createNewGraph} />
-                                <input type="submit" value="Add to graph" onClick={addToGraph} />
-                            </form>
+                            <input
+                                type="search"
+                                placeholder="Article title"
+                                onChange={(e) => setInput(e.target.value)}
+                            />
+                            <br />
+                            <input type="submit" value="Create new graph" onClick={createNewGraph} />
+                            <input type="submit" value="Add to graph" onClick={addToGraph} />
                         </div>
                     </>
                 )}

@@ -42,7 +42,6 @@ Index
 -   [x] Delete all unconnected nodes
 -   [ ] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
 -   [ ] Adjust it so that newly spawned nodes spawn near the clicked nodes
--   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Add keep selected nodes to context menu
 -   [ ] Notify user when article is not found in the database
 -   [ ] Maybe change the color of in-going and out-going links when selecting a node? Have to think about case where two connected nodes are selected; maybe only allows this when one node is selected
@@ -55,6 +54,8 @@ Index
 ### Longer-term modifications
 
 -   [ ] holy crap the performance for expanding a node is awful
+-   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
+-   [ ] Allow user to click and drag a node and make it stick
 -   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
 -   [ ] Implement cache for summaries and links
 -   [ ] Add something like Elastic Search to Wikipedia articles
