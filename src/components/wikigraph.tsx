@@ -7,6 +7,7 @@ import About from "./sidebar/about";
 import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
 import { createConfig } from "../util/neo4jConfig";
+import WikigraphAlert, { WikigraphAlertState, WikigraphAlertType } from "./alert";
 
 const StyledCanvas = styled.div`
     height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
@@ -113,6 +114,15 @@ const WikiGraph: React.FC<Props> = ({
         }
     };
 
+    // keep track of record count status
+    const [recordCount, setRecordCount] = useState(-1);
+
+    // keep track of alert status
+    const [alertState, setAlertState] = useState<WikigraphAlertState>({
+        show: false,
+        type: WikigraphAlertType.None,
+    });
+
     // get reference to selection so that we can use the current value in the vis event listeners
     // otherwise, the value lags behind
     const selectionRef = useRef(selection);
@@ -127,8 +137,9 @@ const WikiGraph: React.FC<Props> = ({
         vis.render();
         setVis(vis);
 
-        // create event listeners once the visualization is rendered
+        // completion event fires whenever the graph is finished rendering
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
+            // create event listeners the FIRST time the graph renders (i.e., only once on page load)
             if (!completionRef.current) {
                 completionRef.current = true;
 
@@ -157,12 +168,19 @@ const WikiGraph: React.FC<Props> = ({
 
                 // 2. listener for "click"
                 vis.network?.on("click", (click) => {
+                    // close context menu
                     setContextMenuState({
                         open: false,
                         type: ContextMenuType.Canvas,
                         mobile: window.innerWidth < 1100,
                         x: 0,
                         y: 0,
+                    });
+
+                    // close alert
+                    setAlertState({
+                        show: false,
+                        type: WikigraphAlertType.None,
                     });
                 });
 
@@ -216,8 +234,31 @@ const WikiGraph: React.FC<Props> = ({
                     });
                 });
             }
+
+            setRecordCount(e.recordCount);
+            // close alert if new graph is rendered and record count is > 1
+            if (e.recordCount > 1) {
+                setAlertState({
+                    show: false,
+                    type: WikigraphAlertType.None,
+                });
+            }
         });
     }, [containerId, serverDatabase, serverURI, serverUser, serverPassword]);
+
+    // ----- alert user if something went wrong -----
+    useEffect(() => {
+        console.log(recordCount);
+        // recordCount = number of (new?) nodes returned in the query
+        if (recordCount === 0) {
+            // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
+            console.log(recordCount);
+            setAlertState({ show: true, type: WikigraphAlertType.NoArticleFound });
+        } else if (recordCount === 1) {
+            // if there's only 1 node, then user tried to expand a node that has no other links
+            setAlertState({ show: true, type: WikigraphAlertType.NoNewConnectionsFound });
+        }
+    }, [recordCount]);
 
     // ----- execute cypher query when user inputs search, update visualization -----
     const createNewGraph = () => {
@@ -295,10 +336,10 @@ const WikiGraph: React.FC<Props> = ({
                     id="stabilize-button"
                     onClick={() => {
                         vis?.stabilize();
-                        vis?.network?.fit();
                     }}
                 />
                 <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
+                <WikigraphAlert state={alertState}></WikigraphAlert>
                 <ContextMenu
                     vis={vis}
                     darkMode={darkMode}

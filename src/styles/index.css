@@ -115,15 +115,15 @@ input:focus {
 #stabilize-button {
     position: absolute;
     margin: 10px 10px;
-    bottom: 0px;
     left: 0px;
+    bottom: 0px;
 }
 
 #center-button {
     position: absolute;
     margin: 10px 10px;
-    bottom: 0px;
     left: 75px;
+    bottom: 0px;
 }
 
 .vis-expand-button {

@@ -52,9 +52,6 @@ export const createConfig = (
                     centralGravity: 0.01,
                     springLength: 200,
                 },
-                stabilization: {
-                    iterations: 250,
-                },
             },
             interaction: { multiselect: true }, // allows for multi-select using a long press or cmd-click
             layout: { randomSeed: 1337 },

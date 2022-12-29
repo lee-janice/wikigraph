@@ -53,10 +53,11 @@ Index
 
 ### Longer-term modifications
 
--   [ ] holy crap the performance for expanding a node is awful
+-   [x] holy crap the performance for expanding a node is awful
+-   [x] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Allow user to click and drag a node and make it stick
--   [ ] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
+-   [ ] Add "find path between two nodes" option
 -   [ ] Implement cache for summaries and links
 -   [ ] Add something like Elastic Search to Wikipedia articles
 -   [ ] Allow user to save/export and load graphs
