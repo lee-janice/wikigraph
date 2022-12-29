@@ -2,7 +2,7 @@
 
 A non-linear, graph-based approach to exploring the depths of Wikipedia
 
-![Screenshot 2022-12-14 at 00-33-42 WikiGraph](https://user-images.githubusercontent.com/43253634/207545984-ca9613a5-865c-400b-9be3-e5c20dc9481e.png)
+![wikigraph](https://user-images.githubusercontent.com/43253634/209751473-3363130c-64ce-4abc-a9d9-c3a6e8abfce0.png)
 
 ## Component structure
 
