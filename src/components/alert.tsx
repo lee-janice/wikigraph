@@ -6,7 +6,7 @@ const StyledAlert = styled.div`
     margin: 10px 10px;
     right: 0px;
     bottom: 0px;
-    width: 256px;
+    width: 300px;
     text-align: right;
     color: var(--borderColor);
 `;
