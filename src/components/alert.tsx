@@ -17,30 +17,30 @@ StyledAlert.defaultProps = {
     },
 };
 
-export enum WikigraphAlertType {
+export enum AlertType {
     NoArticleFound,
-    NoNewConnectionsFound,
+    EndOfPath,
     None,
 }
 
-export type WikigraphAlertState = {
+export type AlertState = {
     show: boolean;
-    type: WikigraphAlertType;
+    type: AlertType;
 };
 
 interface Props {
-    state: WikigraphAlertState;
+    state: AlertState;
 }
 
-const WikigraphAlert: React.FC<Props> = ({ state }) => {
+const Alert: React.FC<Props> = ({ state }) => {
     switch (state.type) {
-        case WikigraphAlertType.NoArticleFound:
+        case AlertType.NoArticleFound:
             return <StyledAlert theme={{ show: state.show }}>No such article was found.</StyledAlert>;
-        case WikigraphAlertType.NoNewConnectionsFound:
-            return <StyledAlert theme={{ show: state.show }}>No new connections were found.</StyledAlert>;
-        case WikigraphAlertType.None:
+        case AlertType.EndOfPath:
+            return <StyledAlert theme={{ show: state.show }}>You've reached the end of the path.</StyledAlert>;
+        case AlertType.None:
             return <div></div>;
     }
 };
 
-export default WikigraphAlert;
+export default Alert;

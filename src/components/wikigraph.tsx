@@ -7,7 +7,7 @@ import About from "./sidebar/about";
 import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
 import { createConfig } from "../util/neo4jConfig";
-import WikigraphAlert, { WikigraphAlertState, WikigraphAlertType } from "./alert";
+import Alert, { AlertState, AlertType } from "./alert";
 
 const StyledCanvas = styled.div`
     height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
@@ -118,9 +118,9 @@ const WikiGraph: React.FC<Props> = ({
     const [recordCount, setRecordCount] = useState(-1);
 
     // keep track of alert status
-    const [alertState, setAlertState] = useState<WikigraphAlertState>({
+    const [alertState, setAlertState] = useState<AlertState>({
         show: false,
-        type: WikigraphAlertType.None,
+        type: AlertType.None,
     });
 
     // get reference to selection so that we can use the current value in the vis event listeners
@@ -180,7 +180,7 @@ const WikiGraph: React.FC<Props> = ({
                     // close alert
                     setAlertState({
                         show: false,
-                        type: WikigraphAlertType.None,
+                        type: AlertType.None,
                     });
                 });
 
@@ -240,7 +240,7 @@ const WikiGraph: React.FC<Props> = ({
             if (e.recordCount > 1) {
                 setAlertState({
                     show: false,
-                    type: WikigraphAlertType.None,
+                    type: AlertType.None,
                 });
             }
         });
@@ -253,10 +253,10 @@ const WikiGraph: React.FC<Props> = ({
         if (recordCount === 0) {
             // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
             console.log(recordCount);
-            setAlertState({ show: true, type: WikigraphAlertType.NoArticleFound });
+            setAlertState({ show: true, type: AlertType.NoArticleFound });
         } else if (recordCount === 1) {
             // if there's only 1 node, then user tried to expand a node that has no other links
-            setAlertState({ show: true, type: WikigraphAlertType.NoNewConnectionsFound });
+            setAlertState({ show: true, type: AlertType.EndOfPath });
         }
     }, [recordCount]);
 
@@ -339,7 +339,7 @@ const WikiGraph: React.FC<Props> = ({
                     }}
                 />
                 <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
-                <WikigraphAlert state={alertState}></WikigraphAlert>
+                <Alert state={alertState}></Alert>
                 <ContextMenu
                     vis={vis}
                     darkMode={darkMode}
