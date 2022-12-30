@@ -139,6 +139,7 @@ const WikiGraph: React.FC<Props> = ({
 
         // completion event fires whenever the graph is finished rendering
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
+            console.log(e.recordCount);
             // create event listeners the FIRST time the graph renders (i.e., only once on page load)
             if (!completionRef.current) {
                 completionRef.current = true;
@@ -248,7 +249,6 @@ const WikiGraph: React.FC<Props> = ({
 
     // ----- alert user if something went wrong -----
     useEffect(() => {
-        console.log(recordCount);
         // recordCount = number of (new?) nodes returned in the query
         if (recordCount === 0) {
             // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
@@ -258,6 +258,7 @@ const WikiGraph: React.FC<Props> = ({
             // if there's only 1 node, then user tried to expand a node that has no other links
             setAlertState({ show: true, type: AlertType.EndOfPath });
         }
+        setRecordCount(-1);
     }, [recordCount]);
 
     // ----- execute cypher query when user inputs search, update visualization -----

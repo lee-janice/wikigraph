@@ -40,10 +40,10 @@ Index
 -   [x] Allow user to double click node to expand the links
 -   [x] Allow user to add nodes to existing graph
 -   [x] Delete all unconnected nodes
--   [ ] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
--   [ ] Adjust it so that newly spawned nodes spawn near the clicked nodes
+-   [x] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
+-   [x] Notify user when article is not found in the database
+-   [ ] Make alert for no additional nodes more accurate—alert when there are no new nodes in the graph as a result of the query
 -   [ ] Add keep selected nodes to context menu
--   [ ] Notify user when article is not found in the database
 -   [ ] Maybe change the color of in-going and out-going links when selecting a node? Have to think about case where two connected nodes are selected; maybe only allows this when one node is selected
 
 #### Clean up code
@@ -63,6 +63,9 @@ Index
 -   [ ] Allow user to save/export and load graphs
 -   [ ] Allow user to click and drag to select all nodes inside an area
 -   [ ] Make an excerpt of the summary (first sentence) appear on hovering over a node
+-   [ ] Aggregate more months of data
+-   [ ] Host the whole database on a server
+-   [ ] Explore possibility of using the whole Wikipedia data dump with groupings by [properties](https://www.wikidata.org/wiki/Wikidata:List_of_properties) instead of clickstream data
 
 ## Build
 
