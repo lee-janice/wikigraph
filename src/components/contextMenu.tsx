@@ -1,5 +1,5 @@
 import html2canvas from "html2canvas";
-import NeoVis from "neovis.js";
+import NeoVis, { Node } from "neovis.js";
 import React, { Dispatch, SetStateAction } from "react";
 import { getWikipediaExtract, getWikipediaLink, searchWikipedia } from "../api/wikipedia";
 import { WikiSummary } from "./sidebar/wikipediaSummaries";
@@ -108,6 +108,32 @@ const ContextMenu: React.FC<Props> = ({
         setState({ ...state, open: false });
     };
 
+    // ----- event handler for "Keep selected nodes" context menu selection -----
+    const handleKeepNode = () => {
+        // get array of all selected nodes
+        const selection = vis?.network?.getSelectedNodes();
+        // for each node in the graph, check if it is in the nodes we should keep, delete if not
+        vis?.nodes.forEach((node: Node) => {
+            if (!selection?.includes(node.id)) {
+                vis?.nodes.remove(node.id);
+            }
+        });
+        // close context menu
+        setState({ ...state, open: false });
+    };
+
+    // ----- event handler for "Expand node links" context menu selection -----
+    const handleExpandNode = () => {
+        selection?.forEach((sId) => {
+            var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) IN [${vis?.network
+                ?.getSelectedNodes()
+                .toString()}] RETURN p1, l, p2`;
+            vis?.updateWithCypher(cypher);
+        });
+        // close context menu
+        setState({ ...state, open: false });
+    };
+
     // ----- event handler for "Delete nodes" context menu selection -----
     const handleDeleteNode = () => {
         // get array of all nodes connected to the nodes to delete
@@ -163,16 +189,27 @@ const ContextMenu: React.FC<Props> = ({
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
+                        <li className="context-menu-item" onClick={handleLoadSummary}>
+                            Load summary from Wikipedia →
+                        </li>
+                        {/* line */}
+                        <hr />
+                        {/* line */}
                         <li className="context-menu-item" onClick={handleCreateNewGraph}>
                             Create new graph with selection
                         </li>
-                        <li className="context-menu-item" onClick={handleLoadSummary}>
-                            Load summary from Wikipedia →
+                        <li className="context-menu-item" onClick={handleKeepNode}>
+                            Keep selected node
+                        </li>
+                        <li className="context-menu-item" onClick={handleExpandNode}>
+                            Expand node links
                         </li>
                         <li className="context-menu-item" onClick={handleDeleteNode}>
                             Delete node
                         </li>
+                        {/* line */}
                         <hr />
+                        {/* line */}
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
                             <img
                                 src={darkMode ? "icons/wikipedia-white.png" : "icons/wikipedia.png"}
@@ -188,16 +225,27 @@ const ContextMenu: React.FC<Props> = ({
             return (
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
+                        <li className="context-menu-item" onClick={handleLoadSummary}>
+                            Load summaries from Wikipedia →
+                        </li>
+                        {/* line */}
+                        <hr />
+                        {/* line */}
                         <li className="context-menu-item" onClick={handleCreateNewGraph}>
                             Create new graph with selection
                         </li>
-                        <li className="context-menu-item" onClick={handleLoadSummary}>
-                            Load summaries from Wikipedia →
+                        <li className="context-menu-item" onClick={handleKeepNode}>
+                            Keep selected nodes
+                        </li>
+                        <li className="context-menu-item" onClick={handleExpandNode}>
+                            Expand node links
                         </li>
                         <li className="context-menu-item" onClick={handleDeleteNode}>
                             Delete nodes
                         </li>
+                        {/* line */}
                         <hr />
+                        {/* line */}
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
                             <img
                                 src={darkMode ? "icons/wikipedia-white.png" : "icons/wikipedia.png"}

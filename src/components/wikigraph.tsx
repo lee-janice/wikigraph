@@ -139,7 +139,6 @@ const WikiGraph: React.FC<Props> = ({
 
         // completion event fires whenever the graph is finished rendering
         vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
-            console.log(e.recordCount);
             // create event listeners the FIRST time the graph renders (i.e., only once on page load)
             if (!completionRef.current) {
                 completionRef.current = true;
@@ -252,7 +251,6 @@ const WikiGraph: React.FC<Props> = ({
         // recordCount = number of (new?) nodes returned in the query
         if (recordCount === 0) {
             // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
-            console.log(recordCount);
             setAlertState({ show: true, type: AlertType.NoArticleFound });
         } else if (recordCount === 1) {
             // if there's only 1 node, then user tried to expand a node that has no other links

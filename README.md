@@ -42,8 +42,9 @@ Index
 -   [x] Delete all unconnected nodes
 -   [x] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
 -   [x] Notify user when article is not found in the database
+-   [x] Add keep selected nodes to context menu
+-   [x] Add expand selected nodes to context menu
 -   [ ] Make alert for no additional nodes more accurate—alert when there are no new nodes in the graph as a result of the query
--   [ ] Add keep selected nodes to context menu
 -   [ ] Maybe change the color of in-going and out-going links when selecting a node? Have to think about case where two connected nodes are selected; maybe only allows this when one node is selected
 
 #### Clean up code
