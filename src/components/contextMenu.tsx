@@ -124,12 +124,10 @@ const ContextMenu: React.FC<Props> = ({
 
     // ----- event handler for "Expand node links" context menu selection -----
     const handleExpandNode = () => {
-        selection?.forEach((sId) => {
-            var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) IN [${vis?.network
-                ?.getSelectedNodes()
-                .toString()}] RETURN p1, l, p2`;
-            vis?.updateWithCypher(cypher);
-        });
+        var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) IN [${vis?.network
+            ?.getSelectedNodes()
+            .toString()}] RETURN p1, l, p2`;
+        vis?.updateWithCypher(cypher);
         // close context menu
         setState({ ...state, open: false });
     };
@@ -155,6 +153,16 @@ const ContextMenu: React.FC<Props> = ({
                 }
             }
         });
+        // close context menu
+        setState({ ...state, open: false });
+    };
+
+    // ----- event handler for "Find path between nodes" context menu selection -----
+    const findPathBetweenNodes = () => {
+        const p1ID = vis?.network?.getSelectedNodes()[0].toString();
+        const p2ID = vis?.network?.getSelectedNodes()[1].toString();
+        var cypher = `MATCH (p1: Page), (p2: Page) WHERE ID(p1) = ${p1ID} AND ID(p2) = ${p2ID} MATCH path = shortestPath((p1)-[*]-(p2)) RETURN path`;
+        vis?.updateWithCypher(cypher);
         // close context menu
         setState({ ...state, open: false });
     };
@@ -243,6 +251,14 @@ const ContextMenu: React.FC<Props> = ({
                         <li className="context-menu-item" onClick={handleDeleteNode}>
                             Delete nodes
                         </li>
+                        {/* line */}
+                        <hr />
+                        {/* line */}
+                        {vis?.network?.getSelectedNodes().length === 2 && (
+                            <li className="context-menu-item" onClick={findPathBetweenNodes}>
+                                Find path between nodes
+                            </li>
+                        )}
                         {/* line */}
                         <hr />
                         {/* line */}
