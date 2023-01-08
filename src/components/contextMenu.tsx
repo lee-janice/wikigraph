@@ -190,7 +190,7 @@ const ContextMenu: React.FC<Props> = ({
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
                         <li className="context-menu-item" onClick={handleLoadSummary}>
-                            Load summary from Wikipedia →
+                            Load summary from Wikipedia {state.mobile ? "↓" : "→"}
                         </li>
                         {/* line */}
                         <hr />
@@ -226,7 +226,7 @@ const ContextMenu: React.FC<Props> = ({
                 <div className="context-menu" id="context-menu" style={style}>
                     <ul className="context-menu-list">
                         <li className="context-menu-item" onClick={handleLoadSummary}>
-                            Load summaries from Wikipedia →
+                            Load summaries from Wikipedia {state.mobile ? "↓" : "→"}
                         </li>
                         {/* line */}
                         <hr />

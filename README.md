@@ -17,10 +17,10 @@ Index
     |   |   └── Stabilize button
     |   |   └── Center button
     |   |   └── *Context menu*
-    |   └── Sidebar
-    |       └── Home tab
-    |       └── About tab
-    |       └── User manual tab
+    ├── Sidebar
+    |   └── Home tab
+    |   └── About tab
+    |   └── User manual tab
     └── Theme toggler
 ```
 
@@ -49,7 +49,7 @@ Index
 
 #### Clean up code
 
--   [ ] Refactor component/file structure
+-   [x] Refactor component/file structure
 -   [ ] Use styled components instead of css file for one-offs
 
 ### Longer-term modifications

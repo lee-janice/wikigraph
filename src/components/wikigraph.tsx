@@ -1,10 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import NeoVis, { NeoVisEvents } from "neovis.js/dist/neovis.js";
 import ContextMenu, { ContextMenuState, ContextMenuType } from "./contextMenu";
-import NavBar, { NavTab } from "./sidebar/navbar";
-import UserManual from "./sidebar/userManual";
-import About from "./sidebar/about";
-import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
+import { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
 import { createConfig } from "../util/neo4jConfig";
 import Alert, { AlertState, AlertType } from "./alert";
@@ -29,70 +26,42 @@ StyledCanvas.defaultProps = {
     },
 };
 
-/* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
-const StyledSidebar = styled.div`
-    height: 100%;
-    width: 33%;
-    padding-top: 20px;
-    top: 0;
-    right: 0;
-    position: fixed; /* stay in place on scroll */
-    z-index: 100;
-    overflow-x: hidden; /* disable horizontal scroll */
-    border-left: 1px solid var(--borderColor);
-    background-color: var(--primaryBackgroundColor);
-
-    @media (max-width: 1100px) {
-        height: 100%;
-        width: 100%;
-        top: 80%;
-        display: block;
-        position: absolute;
-        z-index: 10000;
-        border-left: none;
-        border-top: 1px solid var(--borderColor);
-    }
-`;
-
 // TODO: figure out how to import this from vis.js
 export type IdType = string | number;
 
 interface Props {
+    vis: NeoVis | null;
+    setVis: Dispatch<SetStateAction<NeoVis | null>>;
     containerId: string;
     serverDatabase: string;
     serverURI: string;
     serverUser: string;
     serverPassword: string;
+    summaries: WikiSummary[];
+    setSummaries: Dispatch<SetStateAction<WikiSummary[]>>;
+    setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>;
     darkMode: boolean;
 }
 
 const WikiGraph: React.FC<Props> = ({
+    vis,
+    setVis,
     containerId,
     serverDatabase,
     serverURI,
     serverUser,
     serverPassword,
+    summaries,
+    setSummaries,
+    setCurrentSummary,
     darkMode,
 }) => {
-    // keep vis object in state
-    const [vis, setVis] = useState<NeoVis | null>(null);
     const [visIsExpanded, setVisIsExpanded] = useState(false);
 
     // keep track of selected nodes and labels
     // TODO: combine into one object
     const [selection, setSelection] = useState<IdType[]>([]);
     const [selectionLabels, setSelectionLabels] = useState([""]);
-
-    // keep track of summaries
-    // TODO: combine into one object
-    const [summaries, setSummaries] = useState<WikiSummary[]>([]);
-    const [currentSummary, setCurrentSummary] = useState<WikiSummary | null>(null);
-
-    // keep track of search bar input
-    const [input, setInput] = useState("");
-
-    // keep track of nav bar tab state
-    const [currentNavTab, setCurrentNavTab] = useState<NavTab>(NavTab.Home);
 
     // keep track of whether the context menu is open or closed
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
@@ -244,7 +213,7 @@ const WikiGraph: React.FC<Props> = ({
                 });
             }
         });
-    }, [containerId, serverDatabase, serverURI, serverUser, serverPassword]);
+    }, [setVis, containerId, serverDatabase, serverURI, serverUser, serverPassword]);
 
     // ----- alert user if something went wrong -----
     useEffect(() => {
@@ -259,129 +228,73 @@ const WikiGraph: React.FC<Props> = ({
         setRecordCount(-1);
     }, [recordCount]);
 
-    // ----- execute cypher query when user inputs search, update visualization -----
-    const createNewGraph = () => {
-        // TODO: replace this with something that does not open the DB up to an injection attack
-        var cypher =
-            'CALL { MATCH (p:Page) WHERE apoc.text.levenshteinSimilarity(p.title, "' +
-            input +
-            '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
-            input +
-            '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
-        // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
-        vis?.renderWithCypher(cypher);
-        vis?.network?.moveTo({ position: { x: 0, y: 0 } });
-    };
-
-    const addToGraph = () => {
-        var cypher =
-            'CALL { MATCH (p:Page) WHERE apoc.text.levenshteinSimilarity(p.title, "' +
-            input +
-            '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
-            input +
-            '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
-        vis?.updateWithCypher(cypher);
-        vis?.network?.moveTo({ position: { x: 0, y: 0 } });
-    };
-
     return (
-        <>
-            {/* graph visualization */}
-            <StyledCanvas theme={{ expanded: visIsExpanded }} id="canvas">
-                <div id={containerId} />
+        <StyledCanvas theme={{ expanded: visIsExpanded }} id="canvas">
+            <div id={containerId} />
+            <img
+                src={
+                    visIsExpanded
+                        ? darkMode
+                            ? "icons/collapse-white.png"
+                            : "icons/collapse.png"
+                        : darkMode
+                        ? "icons/expand-white.png"
+                        : "icons/expand.png"
+                }
+                alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
+                className="vis-expand-button"
+                onClick={() => setVisIsExpanded(!visIsExpanded)}
+            />
+            {contextMenuState.mobile && (
                 <img
                     src={
-                        visIsExpanded
+                        contextMenuState.open
                             ? darkMode
-                                ? "icons/collapse-white.png"
-                                : "icons/collapse.png"
+                                ? "icons/close-white.png"
+                                : "icons/close.png"
                             : darkMode
-                            ? "icons/expand-white.png"
-                            : "icons/expand.png"
+                            ? "icons/kebab-white.png"
+                            : "icons/kebab.png"
                     }
                     alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
-                    className="vis-expand-button"
-                    onClick={() => setVisIsExpanded(!visIsExpanded)}
-                />
-                {contextMenuState.mobile && (
-                    <img
-                        src={
-                            contextMenuState.open
-                                ? darkMode
-                                    ? "icons/close-white.png"
-                                    : "icons/close.png"
-                                : darkMode
-                                ? "icons/kebab-white.png"
-                                : "icons/kebab.png"
-                        }
-                        alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
-                        className="mobile-context-button"
-                        onClick={() => {
-                            var type;
-                            if (selection.length === 0) {
-                                type = ContextMenuType.Canvas;
-                            } else if (selection.length === 1) {
-                                type = ContextMenuType.Node;
-                            } else {
-                                type = ContextMenuType.Nodes;
-                            }
-                            setContextMenuState({ ...contextMenuState, open: !contextMenuState.open, type: type });
-                        }}
-                    />
-                )}
-                <input
-                    type="submit"
-                    value="Stabilize"
-                    id="stabilize-button"
+                    className="mobile-context-button"
                     onClick={() => {
-                        vis?.stabilize();
+                        var type;
+                        if (selection.length === 0) {
+                            type = ContextMenuType.Canvas;
+                        } else if (selection.length === 1) {
+                            type = ContextMenuType.Node;
+                        } else {
+                            type = ContextMenuType.Nodes;
+                        }
+                        setContextMenuState({ ...contextMenuState, open: !contextMenuState.open, type: type });
                     }}
                 />
-                <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
-                <Alert state={alertState}></Alert>
-                <ContextMenu
-                    vis={vis}
-                    darkMode={darkMode}
-                    state={contextMenuState}
-                    setState={setContextMenuState}
-                    selection={selection}
-                    setSelection={setSelection}
-                    selectionLabels={selectionLabels}
-                    setSelectionLabels={setSelectionLabels}
-                    summaries={summaries}
-                    setSummaries={setSummaries}
-                    setCurrentSummary={setCurrentSummary}
-                />
-            </StyledCanvas>
-            {/* sidebar */}
-            <StyledSidebar className="sidebar">
-                <NavBar currentNavTab={currentNavTab} setCurrentNavTab={setCurrentNavTab} />
-                {currentNavTab === NavTab.Home && (
-                    <>
-                        <WikipediaSummaries
-                            summaries={summaries}
-                            setSummaries={setSummaries}
-                            currentSummary={currentSummary}
-                            setCurrentSummary={setCurrentSummary}
-                        />
-                        <div className="search-bar">
-                            Search for a Wikipedia article:
-                            <br />
-                            <input
-                                type="search"
-                                placeholder="Article title"
-                                onChange={(e) => setInput(e.target.value)}
-                            />
-                            <br />
-                            <input type="submit" value="Create new graph" onClick={createNewGraph} />
-                            <input type="submit" value="Add to graph" onClick={addToGraph} />
-                        </div>
-                    </>
-                )}
-                {currentNavTab === NavTab.About && <About />}
-                {currentNavTab === NavTab.UserManual && <UserManual />}
-            </StyledSidebar>
-        </>
+            )}
+            <input
+                type="submit"
+                value="Stabilize"
+                id="stabilize-button"
+                onClick={() => {
+                    vis?.stabilize();
+                }}
+            />
+            <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
+            <Alert state={alertState}></Alert>
+            <ContextMenu
+                vis={vis}
+                darkMode={darkMode}
+                state={contextMenuState}
+                setState={setContextMenuState}
+                selection={selection}
+                setSelection={setSelection}
+                selectionLabels={selectionLabels}
+                setSelectionLabels={setSelectionLabels}
+                summaries={summaries}
+                setSummaries={setSummaries}
+                setCurrentSummary={setCurrentSummary}
+            />
+        </StyledCanvas>
     );
 };
 
