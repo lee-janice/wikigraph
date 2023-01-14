@@ -55,7 +55,7 @@ function App() {
 	}
      
     return (
-        <VisContext.Provider value={{vis, visNetwork}}>
+        <>
             <header>
                 <h1>
                     <strong>WikiGraph</strong>
@@ -63,6 +63,7 @@ function App() {
                 <p className="subtitle">A graph-based approach to exploring the depths of Wikipedia</p>
             </header>
             <div className="App">
+                <VisContext.Provider value={{vis, visNetwork}}>
                 {/* graph visualization */}
                 <WikiGraph
                     containerId={"vis"}
@@ -71,6 +72,7 @@ function App() {
                     setCurrentSummary={setCurrentSummary}
                     darkMode={darkMode}
                 />
+                </VisContext.Provider>
                 {/* sidebar */}
                 <Sidebar
                     vis={vis}
@@ -86,7 +88,7 @@ function App() {
                     <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} /> Dark mode
                 </label>
             </div>
-        </VisContext.Provider>
+        </>
     );
 }
 
