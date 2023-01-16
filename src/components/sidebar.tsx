@@ -3,8 +3,8 @@ import UserManual from "./sidebar/userManual";
 import About from "./sidebar/about";
 import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
-import NeoVis from "neovis.js";
 import { Dispatch, SetStateAction, useState } from "react";
+import { Vis, VisNetwork } from "../api/vis/vis";
 
 /* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
 const StyledSidebar = styled.div`
@@ -32,7 +32,8 @@ const StyledSidebar = styled.div`
 `;
 
 interface Props {
-    vis: NeoVis | null;
+    vis: Vis | null;
+    visNetwork: VisNetwork | null;
     input: string;
     setInput: Dispatch<SetStateAction<string>>;
     summaries: WikiSummary[];
@@ -43,6 +44,7 @@ interface Props {
 
 const Sidebar: React.FC<Props> = ({
     vis,
+    visNetwork,
     input,
     setInput,
     summaries,
@@ -52,6 +54,10 @@ const Sidebar: React.FC<Props> = ({
 }) => {
     // keep track of nav bar tab state
     const [currentNavTab, setCurrentNavTab] = useState<NavTab>(NavTab.Home);
+
+    if (!vis || !visNetwork) {
+        return <StyledSidebar className="sidebar"></StyledSidebar>;
+    }
 
     // ----- execute cypher query when user inputs search, update visualization -----
     const createNewGraph = () => {
@@ -63,8 +69,8 @@ const Sidebar: React.FC<Props> = ({
             input +
             '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
         // TODO: only render if the query returns > 0 nodes, otherwise tell user no nodes were found
-        vis?.renderWithCypher(cypher);
-        vis?.network?.moveTo({ position: { x: 0, y: 0 } });
+        vis.renderWithCypher(cypher);
+        visNetwork.moveTo({ position: { x: 0, y: 0 } });
     };
 
     const addToGraph = () => {
@@ -74,8 +80,8 @@ const Sidebar: React.FC<Props> = ({
             '") > 0.65 RETURN p.title as title ORDER BY apoc.text.levenshteinSimilarity(p.title, "' +
             input +
             '") DESC LIMIT 1 } MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE p1.title = title RETURN p1, l, p2';
-        vis?.updateWithCypher(cypher);
-        vis?.network?.moveTo({ position: { x: 0, y: 0 } });
+        vis.updateWithCypher(cypher);
+        visNetwork.moveTo({ position: { x: 0, y: 0 } });
     };
 
     return (
