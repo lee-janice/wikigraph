@@ -143,8 +143,6 @@ class VisLoader {
     private vis: NeoVis | undefined;
     public loaded: boolean = false;
 
-    // constructor() {}
-
     load(onReady: (vis: NeoVis, e: any) => void) {
         if (!this.vis) {
             this.vis = createConfig(CONTAINER_ID, NEO4J_DB, NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD);

@@ -5,6 +5,8 @@ import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Vis, VisNetwork } from "../api/vis/vis";
+import React from "react";
+import { VisContext } from "../context/visContext";
 
 /* https://www.w3schools.com/howto/howto_css_fixed_sidebar.asp */
 const StyledSidebar = styled.div`
@@ -32,8 +34,6 @@ const StyledSidebar = styled.div`
 `;
 
 interface Props {
-    vis: Vis | null;
-    visNetwork: VisNetwork | null;
     input: string;
     setInput: Dispatch<SetStateAction<string>>;
     summaries: WikiSummary[];
@@ -42,16 +42,9 @@ interface Props {
     setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>;
 }
 
-const Sidebar: React.FC<Props> = ({
-    vis,
-    visNetwork,
-    input,
-    setInput,
-    summaries,
-    setSummaries,
-    currentSummary,
-    setCurrentSummary,
-}) => {
+const Sidebar: React.FC<Props> = ({ input, setInput, summaries, setSummaries, currentSummary, setCurrentSummary }) => {
+    const { vis, visNetwork } = React.useContext(VisContext);
+
     // keep track of nav bar tab state
     const [currentNavTab, setCurrentNavTab] = useState<NavTab>(NavTab.Home);
 
