@@ -48,9 +48,8 @@ export class VisNetwork implements VisNetworkEvents {
 
     // ----- event listeners -----
     onSelect(callback: (e: any, nodeIds: IdType[]) => void): void {
-        const nodeIds = this.network.getSelectedNodes();
-
         this.network.on("select", (e) => {
+            const nodeIds = this.network.getSelectedNodes();
             callback(e, nodeIds);
         });
     }

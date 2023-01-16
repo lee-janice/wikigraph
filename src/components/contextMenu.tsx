@@ -258,13 +258,15 @@ const ContextMenu: React.FC<Props> = ({
                         <hr />
                         {/* line */}
                         {visNetwork.getSelectedNodes().length === 2 && (
-                            <li className="context-menu-item" onClick={findPathBetweenNodes}>
-                                Find path between nodes
-                            </li>
+                            <>
+                                <li className="context-menu-item" onClick={findPathBetweenNodes}>
+                                    Find path between nodes
+                                </li>
+                                {/* line */}
+                                <hr />
+                                {/* line */}
+                            </>
                         )}
-                        {/* line */}
-                        <hr />
-                        {/* line */}
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
                             <img
                                 src={darkMode ? "icons/wikipedia-white.png" : "icons/wikipedia.png"}

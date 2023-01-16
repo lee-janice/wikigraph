@@ -101,6 +101,7 @@ const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setC
 
         // 1. listener for "select"
         visNetwork.onSelect((e, nodeIds) => {
+            // update selection state
             if (nodeIds) {
                 updateSelectionState(nodeIds);
             }
@@ -130,7 +131,7 @@ const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setC
             if (click.nodes.length > 0) {
                 const nodeId = click.nodes[0];
                 var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
-                vis?.updateWithCypher(cypher);
+                vis.updateWithCypher(cypher);
             }
         });
 

@@ -4,7 +4,6 @@ import About from "./sidebar/about";
 import WikipediaSummaries, { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
 import { Dispatch, SetStateAction, useState } from "react";
-import { Vis, VisNetwork } from "../api/vis/vis";
 import React from "react";
 import { VisContext } from "../context/visContext";
 
