@@ -1,5 +1,5 @@
-import type { Network, IdType, Position, MoveToOptions, SelectionOptions, DirectionType, Node } from "vis-network";
-import NeoVis, { Cypher, NeoVisEvents } from "neovis.js/dist/neovis.js";
+import type { Network, IdType, Position, MoveToOptions, SelectionOptions, DirectionType } from "vis-network";
+import NeoVis, { Cypher, NeoVisEvents, Node } from "neovis.js/dist/neovis.js";
 import { createConfig } from "./neo4jConfig";
 import type * as VN from "vis-network";
 
