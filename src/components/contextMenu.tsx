@@ -1,9 +1,10 @@
 import html2canvas from "html2canvas";
-import NeoVis, { Node } from "neovis.js";
+import { Node } from "neovis.js";
+import type { IdType } from "vis-network";
 import React, { Dispatch, SetStateAction } from "react";
 import { getWikipediaExtract, getWikipediaLink, searchWikipedia } from "../api/wikipedia";
 import { WikiSummary } from "./sidebar/wikipediaSummaries";
-import { IdType } from "./wikigraph";
+import { Vis, VisNetwork } from "../api/vis/vis";
 
 export enum ContextMenuType {
     Node,
@@ -20,7 +21,8 @@ export type ContextMenuState = {
 };
 
 interface Props {
-    vis?: NeoVis | null;
+    vis: Vis;
+    visNetwork: VisNetwork;
     darkMode: boolean;
     state: ContextMenuState;
     setState: Dispatch<SetStateAction<ContextMenuState>>;
@@ -35,6 +37,7 @@ interface Props {
 
 const ContextMenu: React.FC<Props> = ({
     vis,
+    visNetwork,
     darkMode,
     state,
     setState,
@@ -67,11 +70,11 @@ const ContextMenu: React.FC<Props> = ({
                 'MATCH (p1:Page)-[l:LINKS_TO]-(p2:Page) WHERE toString(ID(p1)) IN split("' +
                 selection +
                 '", ",") RETURN p1, l, p2';
-            vis?.renderWithCypher(cypher);
-            vis?.network?.moveTo({ position: { x: 0, y: 0 } });
+            vis.renderWithCypher(cypher);
+            visNetwork.moveTo({ position: { x: 0, y: 0 } });
 
             // de-select old nodes once new vis is rendered
-            vis?.network?.setSelection({ nodes: [], edges: [] });
+            visNetwork.setSelection({ nodes: [], edges: [] });
             // reset selection state once new vis is re-rendered
             setSelection([]);
             setSelectionLabels([]);
@@ -111,11 +114,11 @@ const ContextMenu: React.FC<Props> = ({
     // ----- event handler for "Keep selected nodes" context menu selection -----
     const handleKeepNode = () => {
         // get array of all selected nodes
-        const selection = vis?.network?.getSelectedNodes();
+        const selection = visNetwork.getSelectedNodes();
         // for each node in the graph, check if it is in the nodes we should keep, delete if not
-        vis?.nodes.forEach((node: Node) => {
-            if (!selection?.includes(node.id)) {
-                vis?.nodes.remove(node.id);
+        vis.nodes().forEach((node: Node) => {
+            if (!selection.includes(node.id)) {
+                vis.nodes().remove(node.id);
             }
         });
         // close context menu
@@ -124,7 +127,7 @@ const ContextMenu: React.FC<Props> = ({
 
     // ----- event handler for "Expand node links" context menu selection -----
     const handleExpandNode = () => {
-        var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) IN [${vis?.network
+        var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) IN [${visNetwork
             ?.getSelectedNodes()
             .toString()}] RETURN p1, l, p2`;
         vis?.updateWithCypher(cypher);
@@ -135,21 +138,21 @@ const ContextMenu: React.FC<Props> = ({
     // ----- event handler for "Delete nodes" context menu selection -----
     const handleDeleteNode = () => {
         // get array of all nodes connected to the nodes to delete
-        const selection = vis?.network?.getSelectedNodes();
+        const selection = visNetwork.getSelectedNodes();
         var connected: Array<any> = [];
-        selection?.forEach((sId) => {
-            connected = connected.concat(vis?.network?.getConnectedNodes(sId));
+        selection.forEach((sId) => {
+            connected = connected.concat(visNetwork.getConnectedNodes(sId));
         });
 
         // delete selected nodes
-        vis?.network?.deleteSelected();
+        visNetwork.deleteSelected();
 
         // for each connected node, check if it is detached, and delete if so
-        connected?.forEach((cId) => {
+        connected.forEach((cId) => {
             // have to get around the weird typing of .getConnectedNodes
             if (typeof cId === "string" || typeof cId === "number") {
-                if (vis?.network?.getConnectedNodes(cId).length === 0) {
-                    vis?.nodes.remove(cId);
+                if (visNetwork.getConnectedNodes(cId).length === 0) {
+                    vis.nodes().remove(cId);
                 }
             }
         });
@@ -159,10 +162,10 @@ const ContextMenu: React.FC<Props> = ({
 
     // ----- event handler for "Find path between nodes" context menu selection -----
     const findPathBetweenNodes = () => {
-        const p1ID = vis?.network?.getSelectedNodes()[0].toString();
-        const p2ID = vis?.network?.getSelectedNodes()[1].toString();
+        const p1ID = visNetwork.getSelectedNodes()[0].toString();
+        const p2ID = visNetwork.getSelectedNodes()[1].toString();
         var cypher = `MATCH (p1: Page), (p2: Page) WHERE ID(p1) = ${p1ID} AND ID(p2) = ${p2ID} MATCH path = shortestPath((p1)-[*]-(p2)) RETURN path`;
-        vis?.updateWithCypher(cypher);
+        vis.updateWithCypher(cypher);
         // close context menu
         setState({ ...state, open: false });
     };
@@ -254,14 +257,16 @@ const ContextMenu: React.FC<Props> = ({
                         {/* line */}
                         <hr />
                         {/* line */}
-                        {vis?.network?.getSelectedNodes().length === 2 && (
-                            <li className="context-menu-item" onClick={findPathBetweenNodes}>
-                                Find path between nodes
-                            </li>
+                        {visNetwork.getSelectedNodes().length === 2 && (
+                            <>
+                                <li className="context-menu-item" onClick={findPathBetweenNodes}>
+                                    Find path between nodes
+                                </li>
+                                {/* line */}
+                                <hr />
+                                {/* line */}
+                            </>
                         )}
-                        {/* line */}
-                        <hr />
-                        {/* line */}
                         <li className="context-menu-item" onClick={handleLaunchWikipediaPage}>
                             <img
                                 src={darkMode ? "icons/wikipedia-white.png" : "icons/wikipedia.png"}

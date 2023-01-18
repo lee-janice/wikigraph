@@ -1,14 +1,13 @@
-import NeoVis from 'neovis.js/dist/neovis.js';
-import { VisNetwork } from '../api/vis/vis';
-import React from 'react';
+import { Vis, VisNetwork } from "../api/vis/vis";
+import React from "react";
 
 interface VisContextProps {
-	vis: NeoVis | null;
+    vis: Vis | null;
     visNetwork: VisNetwork | null;
 }
 
 const defaultValue: VisContextProps = {
-	vis: null,
+    vis: null,
     visNetwork: null,
 };
 
