@@ -3,16 +3,17 @@ import WikiGraph from "./components/wikigraph";
 import { useEffect, useState } from "react";
 import { WikiSummary } from "./components/sidebar/wikipediaSummaries";
 import Sidebar from "./components/sidebar";
-import NeoVis from "neovis.js";
-
-const NEO4J_DB = String(process.env.REACT_APP_NEO4J_DB);
-const NEO4J_URI = String(process.env.REACT_APP_NEO4J_URI);
-const NEO4J_USER = String(process.env.REACT_APP_NEO4J_USER);
-const NEO4J_PASSWORD = String(process.env.REACT_APP_NEO4J_PASSWORD);
+import NeoVis from 'neovis.js';
+import { VisNetwork, visLoader } from "./api/vis/vis";
+import { VisContext } from "./context/visContext";
 
 function App() {
+    // keep vis object in state
+    const [vis, setVis] = useState<NeoVis | null>(null);
+    const [visNetwork, setVisNetwork] = useState<VisNetwork | null>(null);
     // set initial theme and keep track of dark mode state
     const [darkMode, setDarkMode] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
+
     // handle change in dark mode toggle
     useEffect(() => {
         if (darkMode) {
@@ -24,8 +25,22 @@ function App() {
         }
     }, [darkMode]);
 
-    // keep vis object in state
-    const [vis, setVis] = useState<NeoVis | null>(null);
+    useEffect(() => {
+		const onReady = (vis: NeoVis, e: any) => {
+			if (!vis.network) {
+				return;
+			}
+			const visNetwork = new VisNetwork(vis.network);
+			setVis(vis);
+			setVisNetwork(visNetwork);
+		};
+		visLoader.load(onReady);
+
+		return () => {
+			setVis(null);
+			setVisNetwork(null);
+		};
+	}, []);
 
     // keep track of summaries
     // TODO: combine into one object
@@ -35,6 +50,10 @@ function App() {
     // keep track of search bar input
     const [input, setInput] = useState("");
 
+    if (!vis || !visNetwork) {
+		return <h1>Loading...</h1>;
+	}
+     
     return (
         <>
             <header>
@@ -44,20 +63,16 @@ function App() {
                 <p className="subtitle">A graph-based approach to exploring the depths of Wikipedia</p>
             </header>
             <div className="App">
+                <VisContext.Provider value={{vis, visNetwork}}>
                 {/* graph visualization */}
                 <WikiGraph
-                    vis={vis}
-                    setVis={setVis}
                     containerId={"vis"}
-                    serverDatabase={NEO4J_DB}
-                    serverURI={NEO4J_URI}
-                    serverUser={NEO4J_USER}
-                    serverPassword={NEO4J_PASSWORD}
                     summaries={summaries}
                     setSummaries={setSummaries}
                     setCurrentSummary={setCurrentSummary}
                     darkMode={darkMode}
                 />
+                </VisContext.Provider>
                 {/* sidebar */}
                 <Sidebar
                     vis={vis}

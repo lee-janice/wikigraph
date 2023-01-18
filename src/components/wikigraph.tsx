@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import NeoVis, { NeoVisEvents } from "neovis.js/dist/neovis.js";
 import ContextMenu, { ContextMenuState, ContextMenuType } from "./contextMenu";
 import { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
-import { createConfig } from "../util/neo4jConfig";
 import Alert, { AlertState, AlertType } from "./alert";
+import { VisContext } from "../context/visContext";
+import React from 'react';
 
 const StyledCanvas = styled.div`
     height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
@@ -30,13 +30,7 @@ StyledCanvas.defaultProps = {
 export type IdType = string | number;
 
 interface Props {
-    vis: NeoVis | null;
-    setVis: Dispatch<SetStateAction<NeoVis | null>>;
     containerId: string;
-    serverDatabase: string;
-    serverURI: string;
-    serverUser: string;
-    serverPassword: string;
     summaries: WikiSummary[];
     setSummaries: Dispatch<SetStateAction<WikiSummary[]>>;
     setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>;
@@ -44,18 +38,13 @@ interface Props {
 }
 
 const WikiGraph: React.FC<Props> = ({
-    vis,
-    setVis,
     containerId,
-    serverDatabase,
-    serverURI,
-    serverUser,
-    serverPassword,
     summaries,
     setSummaries,
     setCurrentSummary,
     darkMode,
 }) => {
+    const { vis, visNetwork } = React.useContext(VisContext);
     const [visIsExpanded, setVisIsExpanded] = useState(false);
 
     // keep track of selected nodes and labels
@@ -96,124 +85,116 @@ const WikiGraph: React.FC<Props> = ({
     // otherwise, the value lags behind
     const selectionRef = useRef(selection);
 
-    // so that we only register event listeners once
-    const completionRef = useRef(false);
-
     // ----- initialize visualization and neovis object -----
     // TODO: maybe export to util file?
     useEffect(() => {
-        const vis = createConfig(containerId, serverDatabase, serverURI, serverUser, serverPassword);
-        vis.render();
-        setVis(vis);
+        if (!vis || !visNetwork) {
+			return;
+		}
 
-        // completion event fires whenever the graph is finished rendering
-        vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
-            // create event listeners the FIRST time the graph renders (i.e., only once on page load)
-            if (!completionRef.current) {
-                completionRef.current = true;
+		const updateSelectionState = (nodeIds: IdType[]) => {
+			// update selection
+			setSelection(nodeIds);
+			selectionRef.current = nodeIds;
 
-                const updateSelectionState = (nodeIds: IdType[]) => {
-                    // update selection
-                    setSelection(nodeIds);
-                    selectionRef.current = nodeIds;
+			// update selection labels
+			var labels = vis.nodes
+				.get()
+				.filter((node: any) => (nodeIds ? nodeIds.includes(node.id) : ''))
+				.map(({ label }: { label?: any }) => {
+					return label;
+				});
+			setSelectionLabels(labels);
+		};
 
-                    // update selection labels
-                    var labels = vis.nodes
-                        .get()
-                        .filter((node: any) => (nodeIds ? nodeIds.includes(node.id) : ""))
-                        .map(({ label }: { label?: any }) => {
-                            return label;
-                        });
-                    setSelectionLabels(labels);
-                };
+		// 1. listener for "select"
+		visNetwork.onSelect((e, nodeIds) => {
+			if (nodeIds) {
+				updateSelectionState(nodeIds);
+			}
+		});
 
-                // 1. listener for "select"
-                vis.network?.on("select", (e) => {
-                    var nodeIds = vis.network?.getSelectedNodes();
-                    if (nodeIds) {
-                        updateSelectionState(nodeIds);
-                    }
-                });
+		// 2. listener for "click"
+		visNetwork.onClick((click) => {
+			// close context menu
+			setContextMenuState({
+				open: false,
+				type: ContextMenuType.Canvas,
+				mobile: window.innerWidth < 1100,
+				x: 0,
+				y: 0,
+			});
 
-                // 2. listener for "click"
-                vis.network?.on("click", (click) => {
-                    // close context menu
-                    setContextMenuState({
-                        open: false,
-                        type: ContextMenuType.Canvas,
-                        mobile: window.innerWidth < 1100,
-                        x: 0,
-                        y: 0,
-                    });
+			// close alert
+			setAlertState({
+				show: false,
+				type: AlertType.None,
+			});
+		});
 
-                    // close alert
-                    setAlertState({
-                        show: false,
-                        type: AlertType.None,
-                    });
-                });
+		// 3. listener for "double click"
+		visNetwork.onDoubleClick((click) => {
+			// if there's a node under the cursor, update visualization with its links
+			if (click.nodes.length > 0) {
+				const nodeId = click.nodes[0];
+				var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
+				vis?.updateWithCypher(cypher);
+			}
+		});
 
-                // 3. listener for "double click"
-                vis.network?.on("doubleClick", (click) => {
-                    // if there's a node under the cursor, update visualization with its links
-                    if (click.nodes.length > 0) {
-                        const nodeId = click.nodes[0];
-                        var cypher = `MATCH (p1: Page)-[l: LINKS_TO]-(p2: Page) WHERE ID(p1) = ${nodeId} RETURN p1, l, p2`;
-                        vis?.updateWithCypher(cypher);
-                    }
-                });
+		// 4. listener for "right click"
+		visNetwork.onContextClick((click) => {
+			click.event.preventDefault();
 
-                // 4. listener for "right click"
-                vis.network?.on("oncontext", (click) => {
-                    click.event.preventDefault();
+			// TODO: figure out why click.nodes is not accurate on right click
+			// get adjusted coordinates to place the context menu
+			var rect = click.event.target.getBoundingClientRect();
+			let correctedX = click.event.x - rect.x;
+			let correctedY = click.event.y - rect.y;
 
-                    // TODO: figure out why click.nodes is not accurate on right click
-                    // get adjusted coordinates to place the context menu
-                    var rect = click.event.target.getBoundingClientRect();
-                    let correctedX = click.event.x - rect.x;
-                    let correctedY = click.event.y - rect.y;
+			var type = ContextMenuType.Canvas;
+			// check if there's a node under the cursor
+			var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
+			if (nodeId) {
+				// select node that was right-clicked
+				if (selectionRef.current) {
+					vis.network?.selectNodes([...selectionRef.current, nodeId]);
+				} else {
+					vis.network?.selectNodes([nodeId]);
+				}
 
-                    var type = ContextMenuType.Canvas;
-                    // check if there's a node under the cursor
-                    var nodeId = vis.network?.getNodeAt({ x: correctedX, y: correctedY });
-                    if (nodeId) {
-                        // select node that was right-clicked
-                        if (selectionRef.current) {
-                            vis.network?.selectNodes([...selectionRef.current, nodeId]);
-                        } else {
-                            vis.network?.selectNodes([nodeId]);
-                        }
+				// update selection state
+				const nodeIds = vis.network?.getSelectedNodes();
+				if (nodeIds) {
+					updateSelectionState(nodeIds);
+					nodeIds.length > 1
+						? (type = ContextMenuType.Nodes)
+						: (type = ContextMenuType.Node);
+				}
+			} else {
+				type = ContextMenuType.Canvas;
+			}
 
-                        // update selection state
-                        const nodeIds = vis.network?.getSelectedNodes();
-                        if (nodeIds) {
-                            updateSelectionState(nodeIds);
-                            nodeIds.length > 1 ? (type = ContextMenuType.Nodes) : (type = ContextMenuType.Node);
-                        }
-                    } else {
-                        type = ContextMenuType.Canvas;
-                    }
+			setContextMenuState({
+				open: true,
+				type: type,
+				mobile: window.screen.width < 1100,
+				x: correctedX,
+				y: correctedY,
+			});
+		});
 
-                    setContextMenuState({
-                        open: true,
-                        type: type,
-                        mobile: window.screen.width < 1100,
-                        x: correctedX,
-                        y: correctedY,
-                    });
-                });
-            }
-
-            setRecordCount(e.recordCount);
-            // close alert if new graph is rendered and record count is > 1
-            if (e.recordCount > 1) {
-                setAlertState({
-                    show: false,
-                    type: AlertType.None,
-                });
-            }
-        });
-    }, [setVis, containerId, serverDatabase, serverURI, serverUser, serverPassword]);
+		// Move the alert logic to the APP.tsx since it's part of the global state,
+        // wire e.recordCount from there
+		// setRecordCount(e.recordCount);
+		// // close alert if new graph is rendered and record count is > 1
+		// if (e.recordCount > 1) {
+		//     setAlertState({
+		//         show: false,
+		//         type: AlertType.None,
+		//     });
+		// }
+	}, [vis, visNetwork]);
 
     // ----- alert user if something went wrong -----
     useEffect(() => {
@@ -280,6 +261,7 @@ const WikiGraph: React.FC<Props> = ({
                 }}
             />
             <input type="submit" value="Center" id="center-button" onClick={() => vis?.network?.fit()} />
+            {/* Move the alert logic to the APP.tsx since it's part of the global state */}
             <Alert state={alertState}></Alert>
             <ContextMenu
                 vis={vis}
