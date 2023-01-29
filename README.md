@@ -40,10 +40,11 @@ Index
 -   [x] Allow user to double click node to expand the links
 -   [x] Allow user to add nodes to existing graph
 -   [x] Delete all unconnected nodes
--   [x] Indicate when there are no nodes in the expansion when the user double-clicks a node (vs. it just taking a long time to render)
 -   [x] Notify user when article is not found in the database
 -   [x] Add keep selected nodes to context menu
 -   [x] Add expand selected nodes to context menu
+-   [x] Add "find path between two nodes" option
+-   [ ] Indicate when there are no nodes in the expansion when the user double-clicks a node
 -   [ ] Make alert for no additional nodes more accurate—alert when there are no new nodes in the graph as a result of the query
 -   [ ] Maybe change the color of in-going and out-going links when selecting a node? Have to think about case where two connected nodes are selected; maybe only allows this when one node is selected
 
@@ -51,6 +52,7 @@ Index
 
 -   [x] Refactor component/file structure
 -   [ ] Use styled components instead of css file for one-offs
+-   [ ] Figure out how to test deploy build to catch errors before Netlify attempts to deploy
 
 ### Longer-term modifications
 
@@ -58,7 +60,6 @@ Index
 -   [x] Make the physics not so wonky and prone to flying off the screen; something like Neo4j Browser
 -   [ ] Add filters for nodes: keep only incoming nodes, keep only outgoing nodes, keep nodes above a certain size, keep links above a certain size, keep top `n` nodes, etc.
 -   [ ] Allow user to click and drag a node and make it stick
--   [ ] Add "find path between two nodes" option
 -   [ ] Implement cache for summaries and links
 -   [ ] Add something like Elastic Search to Wikipedia articles
 -   [ ] Allow user to save/export and load graphs

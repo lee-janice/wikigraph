@@ -1,5 +1,5 @@
 import type { Network, IdType, Position, MoveToOptions, SelectionOptions, DirectionType } from "vis-network";
-import NeoVis, { Cypher, NeoVisEvents, Node } from "neovis.js/dist/neovis.js";
+import NeoVis, { Cypher, EventFunctionTypes, NeoVisEvents, Node } from "neovis.js/dist/neovis.js";
 import { createConfig } from "./neo4jConfig";
 import type * as VN from "vis-network";
 
@@ -35,6 +35,7 @@ interface VisEvents {
     renderWithCypher(query: Cypher): void;
     updateWithCypher(query: Cypher): void;
     stabilize(): void;
+    registerOnEvent<T extends NeoVisEvents>(eventType: T, handler: EventFunctionTypes[T]): void;
 }
 
 const CONTAINER_ID = "vis";
@@ -135,6 +136,10 @@ export class Vis implements VisEvents {
 
     stabilize(): void {
         this.vis.stabilize();
+    }
+
+    registerOnEvent<T extends NeoVisEvents>(eventType: T, handler: EventFunctionTypes[T]) {
+        this.vis.registerOnEvent(eventType, handler);
     }
 }
 
