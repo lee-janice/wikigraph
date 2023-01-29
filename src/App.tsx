@@ -1,12 +1,11 @@
 import "./styles/App.css";
 import WikiGraph from "./components/wikigraph";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { WikiSummary } from "./components/sidebar/wikipediaSummaries";
 import Sidebar from "./components/sidebar";
-import NeoVis, { NeoVisEvents } from "neovis.js";
-import { VisNetwork, visLoader, Vis } from "./api/vis/vis";
+import { VisNetwork, Vis, visLoader } from "./api/vis/vis";
 import { VisContext } from "./context/visContext";
-import type * as VN from "vis-network";
+import NeoVis from "neovis.js";
 
 function App() {
     // keep vis object in state
@@ -26,7 +25,7 @@ function App() {
         }
     }, [darkMode]);
 
-    const currentNodesRef = useRef<VN.DataSet<Node>>(null);
+    // const currentNodesRef = useRef<VN.DataSet<Node>>(null);
 
     useEffect(() => {
         const onReady = (vis: NeoVis, e: any) => {
@@ -35,7 +34,7 @@ function App() {
             }
             setVis(new Vis(vis));
             setVisNetwork(new VisNetwork(vis.network));
-            currentNodesRef.current = vis.nodes;
+            // currentNodesRef.current = vis.nodes;
         };
         visLoader.load(onReady);
         return () => {
@@ -47,14 +46,14 @@ function App() {
     // useEffect(() => {
     // when vis renders, check if new nodes are added
     // if not, then some action the user took did not result in a change
-    vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
-        console.log(currentNodesRef.current);
-        console.log(vis.nodes());
-        if (currentNodesRef.current.length === vis.nodes()) {
-            console.log("that's the same");
-        }
-        currentNodesRef.current = vis.nodes();
-    });
+    // vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
+    //     console.log(currentNodesRef.current);
+    //     console.log(vis.nodes());
+    //     if (currentNodesRef.current.length === vis.nodes()) {
+    //         console.log("that's the same");
+    //     }
+    //     currentNodesRef.current = vis.nodes();
+    // });
     // }, []);
 
     // keep track of summaries
