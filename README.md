@@ -44,8 +44,8 @@ Index
 -   [x] Add keep selected nodes to context menu
 -   [x] Add expand selected nodes to context menu
 -   [x] Add "find path between two nodes" option
--   [ ] Indicate when there are no nodes in the expansion when the user double-clicks a node
--   [ ] Make alert for no additional nodes more accurate—alert when there are no new nodes in the graph as a result of the query
+-   [x] Indicate when there are no nodes in the expansion when the user double-clicks a node
+-   [ ] Make alert for no additional nodes more accurate—alert when there are no new nodes in the graph as a result of the query (currently breaks on `Find path between nodes`)
 -   [ ] Maybe change the color of in-going and out-going links when selecting a node? Have to think about case where two connected nodes are selected; maybe only allows this when one node is selected
 
 #### Clean up code

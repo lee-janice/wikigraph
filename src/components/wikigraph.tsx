@@ -7,17 +7,11 @@ import { AlertState, AlertType } from "./alert";
 import { VisContext } from "../context/visContext";
 
 const StyledCanvas = styled.div`
-    height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
-    width: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
-    top: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
-    left: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
-    z-index: ${(props) => (props.theme.expanded ? "100000;" : "100;")}
+    height: inherit;
+    width: inherit;
+    top: inherit;
+    left: inherit;
     position: fixed;
-
-    @media (max-width: 1100px) {
-        height: ${(props) => (props.theme.expanded ? "100%;" : "55%;")}
-        width: ${(props) => (props.theme.expanded ? "100%;" : "90%;")}
-    }
 `;
 
 StyledCanvas.defaultProps = {
@@ -44,7 +38,6 @@ const WikiGraph: React.FC<Props> = ({
     darkMode,
 }) => {
     const { vis, visNetwork } = React.useContext(VisContext);
-    const [visIsExpanded, setVisIsExpanded] = useState(false);
 
     // keep track of selected nodes and labels
     // TODO: combine into one object
@@ -168,23 +161,9 @@ const WikiGraph: React.FC<Props> = ({
     }, [vis, visNetwork, setAlertState]);
 
     return (
-        <StyledCanvas theme={{ expanded: visIsExpanded }} id="canvas">
+        <StyledCanvas id="canvas">
             <div id={containerId} />
             {!vis && <h2 style={{ position: `absolute`, right: `25px`, bottom: `5px` }}>Loading...</h2>}
-            <img
-                src={
-                    visIsExpanded
-                        ? darkMode
-                            ? "icons/collapse-white.png"
-                            : "icons/collapse.png"
-                        : darkMode
-                        ? "icons/expand-white.png"
-                        : "icons/expand.png"
-                }
-                alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
-                className="vis-expand-button"
-                onClick={() => setVisIsExpanded(!visIsExpanded)}
-            />
             {contextMenuState.mobile && (
                 <img
                     src={
@@ -196,7 +175,7 @@ const WikiGraph: React.FC<Props> = ({
                             ? "icons/kebab-white.png"
                             : "icons/kebab.png"
                     }
-                    alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
+                    alt={contextMenuState.open ? "Close context menu button" : "Open context menu button"}
                     className="mobile-context-button"
                     onClick={() => {
                         var type;
@@ -211,15 +190,6 @@ const WikiGraph: React.FC<Props> = ({
                     }}
                 />
             )}
-            <input
-                type="submit"
-                value="Stabilize"
-                id="stabilize-button"
-                onClick={() => {
-                    vis?.stabilize();
-                }}
-            />
-            <input type="submit" value="Center" id="center-button" onClick={() => visNetwork?.fit()} />
             {vis && visNetwork && (
                 <ContextMenu
                     vis={vis}

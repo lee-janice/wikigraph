@@ -26,7 +26,7 @@ const StyledSidebar = styled.div`
         top: 80%;
         display: block;
         position: absolute;
-        z-index: 10000;
+        z-index: 1000;
         border-left: none;
         border-top: 1px solid var(--borderColor);
     }

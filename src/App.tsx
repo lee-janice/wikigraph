@@ -5,8 +5,29 @@ import { WikiSummary } from "./components/sidebar/wikipediaSummaries";
 import Sidebar from "./components/sidebar";
 import { VisNetwork, Vis, visLoader } from "./api/vis/vis";
 import { VisContext } from "./context/visContext";
-import NeoVis from "neovis.js";
+import NeoVis, { NeoVisEvents } from "neovis.js";
 import Alert, { AlertState, AlertType } from "./components/alert";
+import styled from "styled-components";
+
+const StyledVisContainer = styled.div`
+    height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
+    width: ${(props) => (props.theme.expanded ? "100%;" : "60%;")}
+    top: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
+    left: ${(props) => (props.theme.expanded ? "0px;" : "inherit;")}
+    z-index: ${(props) => (props.theme.expanded ? "10000;" : "0;")}
+    position: fixed;
+
+    @media (max-width: 1100px) {
+        height: ${(props) => (props.theme.expanded ? "100%;" : "55%;")}
+        width: ${(props) => (props.theme.expanded ? "100%;" : "90%;")}
+    }
+`;
+
+StyledVisContainer.defaultProps = {
+    theme: {
+        expanded: false,
+    },
+};
 
 function App() {
     // keep vis object in state
@@ -26,7 +47,8 @@ function App() {
         }
     }, [darkMode]);
 
-    // const currentNodesRef = useRef<VN.DataSet<Node>>(null);
+    // keep track of whether the vis is expanded
+    const [visIsExpanded, setVisIsExpanded] = useState(false);
 
     useEffect(() => {
         const onReady = (vis: NeoVis, e: any) => {
@@ -35,7 +57,11 @@ function App() {
             }
             setVis(new Vis(vis));
             setVisNetwork(new VisNetwork(vis.network));
-            // currentNodesRef.current = vis.nodes;
+            // register record count event
+            vis.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
+                setRecordCount(e.recordCount);
+                console.log(e.recordCount);
+            });
         };
         visLoader.load(onReady);
         return () => {
@@ -63,6 +89,7 @@ function App() {
 
     // ----- alert user if something went wrong -----
     useEffect(() => {
+        console.log(recordCount);
         // recordCount = number of nodes returned in the query
         if (recordCount === 0) {
             // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
@@ -74,30 +101,6 @@ function App() {
         setRecordCount(-1);
     }, [recordCount]);
 
-    // useEffect(() => {
-    // when vis renders, check if new nodes are added
-    // if not, then some action the user took did not result in a change
-    // vis?.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
-    //     console.log(currentNodesRef.current);
-    //     console.log(vis.nodes());
-    //     if (currentNodesRef.current.length === vis.nodes()) {
-    //         console.log("that's the same");
-    //     }
-    //     currentNodesRef.current = vis.nodes();
-    // });
-    // }, []);
-
-    // Move the alert logic to the APP.tsx since it's part of the global state,
-    // wire e.recordCount from there
-    // setRecordCount(e.recordCount);
-    // // close alert if new graph is rendered and record count is > 1
-    // if (e.recordCount > 1) {
-    //     setAlertState({
-    //         show: false,
-    //         type: AlertType.None,
-    //     });
-    // }
-
     return (
         <div>
             <header>
@@ -108,17 +111,43 @@ function App() {
             </header>
             <div className="App">
                 <VisContext.Provider value={{ vis, visNetwork }}>
-                    {/* graph visualization */}
-                    <WikiGraph
-                        containerId={"vis"}
-                        summaries={summaries}
-                        setSummaries={setSummaries}
-                        setCurrentSummary={setCurrentSummary}
-                        setAlertState={setAlertState}
-                        darkMode={darkMode}
-                    />
-                    {/* alert */}
-                    <Alert state={alertState}></Alert>
+                    <StyledVisContainer theme={{ expanded: visIsExpanded }}>
+                        {/* graph visualization */}
+                        <WikiGraph
+                            containerId={"vis"}
+                            summaries={summaries}
+                            setSummaries={setSummaries}
+                            setCurrentSummary={setCurrentSummary}
+                            setAlertState={setAlertState}
+                            darkMode={darkMode}
+                        />
+                        {/* buttons */}
+                        <img
+                            src={
+                                visIsExpanded
+                                    ? darkMode
+                                        ? "icons/collapse-white.png"
+                                        : "icons/collapse.png"
+                                    : darkMode
+                                    ? "icons/expand-white.png"
+                                    : "icons/expand.png"
+                            }
+                            alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
+                            className="vis-expand-button"
+                            onClick={() => setVisIsExpanded(!visIsExpanded)}
+                        />
+                        <input
+                            type="submit"
+                            value="Stabilize"
+                            id="stabilize-button"
+                            onClick={() => {
+                                vis?.stabilize();
+                            }}
+                        />
+                        <input type="submit" value="Center" id="center-button" onClick={() => visNetwork?.fit()} />
+                        {/* alert */}
+                        <Alert state={alertState}></Alert>
+                    </StyledVisContainer>
                     {/* sidebar */}
                     <Sidebar
                         input={input}

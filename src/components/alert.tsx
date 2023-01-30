@@ -9,6 +9,7 @@ const StyledAlert = styled.div`
     width: 300px;
     text-align: right;
     color: var(--borderColor);
+    z-index: 10000000;
 `;
 
 StyledAlert.defaultProps = {
