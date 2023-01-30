@@ -3,7 +3,7 @@ import type { IdType } from "vis-network";
 import ContextMenu, { ContextMenuState, ContextMenuType } from "./contextMenu";
 import { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
-import Alert, { AlertState, AlertType } from "./alert";
+import { AlertState, AlertType } from "./alert";
 import { VisContext } from "../context/visContext";
 
 const StyledCanvas = styled.div`
@@ -31,10 +31,18 @@ interface Props {
     summaries: WikiSummary[];
     setSummaries: Dispatch<SetStateAction<WikiSummary[]>>;
     setCurrentSummary: Dispatch<SetStateAction<WikiSummary | null>>;
+    setAlertState: Dispatch<SetStateAction<AlertState>>;
     darkMode: boolean;
 }
 
-const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setCurrentSummary, darkMode }) => {
+const WikiGraph: React.FC<Props> = ({
+    containerId,
+    summaries,
+    setSummaries,
+    setCurrentSummary,
+    setAlertState,
+    darkMode,
+}) => {
     const { vis, visNetwork } = React.useContext(VisContext);
     const [visIsExpanded, setVisIsExpanded] = useState(false);
 
@@ -62,15 +70,6 @@ const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setC
             }
         }
     };
-
-    // keep track of record count status
-    const [recordCount, setRecordCount] = useState(-1);
-
-    // keep track of alert status
-    const [alertState, setAlertState] = useState<AlertState>({
-        show: false,
-        type: AlertType.None,
-    });
 
     // get reference to selection so that we can use the current value in the vis event listeners
     // otherwise, the value lags behind
@@ -148,18 +147,10 @@ const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setC
             var type = ContextMenuType.Canvas;
             // check if there's a node under the cursor
             var nodeId = visNetwork.getNodeAt({ x: correctedX, y: correctedY });
+            // update context menu state based on check
             if (nodeId) {
-                // select node that was right-clicked
-                if (selectionRef.current) {
-                    visNetwork.selectNodes([...selectionRef.current, nodeId]);
-                } else {
-                    visNetwork.selectNodes([nodeId]);
-                }
-
-                // update selection state
                 const nodeIds = visNetwork.getSelectedNodes();
                 if (nodeIds) {
-                    updateSelectionState(nodeIds);
                     nodeIds.length > 1 ? (type = ContextMenuType.Nodes) : (type = ContextMenuType.Node);
                 }
             } else {
@@ -174,31 +165,7 @@ const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setC
                 y: correctedY,
             });
         });
-
-        // Move the alert logic to the APP.tsx since it's part of the global state,
-        // wire e.recordCount from there
-        // setRecordCount(e.recordCount);
-        // // close alert if new graph is rendered and record count is > 1
-        // if (e.recordCount > 1) {
-        //     setAlertState({
-        //         show: false,
-        //         type: AlertType.None,
-        //     });
-        // }
-    }, [vis, visNetwork]);
-
-    // ----- alert user if something went wrong -----
-    useEffect(() => {
-        // recordCount = number of nodes returned in the query
-        if (recordCount === 0) {
-            // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
-            setAlertState({ show: true, type: AlertType.NoArticleFound });
-        } else if (recordCount === 1) {
-            // if there's only 1 node, then user tried to expand a node that has no other links
-            setAlertState({ show: true, type: AlertType.EndOfPath });
-        }
-        setRecordCount(-1);
-    }, [recordCount]);
+    }, [vis, visNetwork, setAlertState]);
 
     return (
         <StyledCanvas theme={{ expanded: visIsExpanded }} id="canvas">
@@ -253,8 +220,6 @@ const WikiGraph: React.FC<Props> = ({ containerId, summaries, setSummaries, setC
                 }}
             />
             <input type="submit" value="Center" id="center-button" onClick={() => visNetwork?.fit()} />
-            {/* Move the alert logic to the APP.tsx since it's part of the global state */}
-            <Alert state={alertState}></Alert>
             {vis && visNetwork && (
                 <ContextMenu
                     vis={vis}

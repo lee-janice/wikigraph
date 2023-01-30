@@ -6,6 +6,7 @@ import Sidebar from "./components/sidebar";
 import { VisNetwork, Vis, visLoader } from "./api/vis/vis";
 import { VisContext } from "./context/visContext";
 import NeoVis from "neovis.js";
+import Alert, { AlertState, AlertType } from "./components/alert";
 
 function App() {
     // keep vis object in state
@@ -43,6 +44,36 @@ function App() {
         };
     }, []);
 
+    // keep track of summaries
+    // TODO: combine into one object
+    const [summaries, setSummaries] = useState<WikiSummary[]>([]);
+    const [currentSummary, setCurrentSummary] = useState<WikiSummary | null>(null);
+
+    // keep track of search bar input
+    const [input, setInput] = useState("");
+
+    // keep track of record count status
+    const [recordCount, setRecordCount] = useState(-1);
+
+    // keep track of alert status
+    const [alertState, setAlertState] = useState<AlertState>({
+        show: false,
+        type: AlertType.None,
+    });
+
+    // ----- alert user if something went wrong -----
+    useEffect(() => {
+        // recordCount = number of nodes returned in the query
+        if (recordCount === 0) {
+            // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)
+            setAlertState({ show: true, type: AlertType.NoArticleFound });
+        } else if (recordCount === 1) {
+            // if there's only 1 node, then user tried to expand a node that has no other links
+            setAlertState({ show: true, type: AlertType.EndOfPath });
+        }
+        setRecordCount(-1);
+    }, [recordCount]);
+
     // useEffect(() => {
     // when vis renders, check if new nodes are added
     // if not, then some action the user took did not result in a change
@@ -56,13 +87,16 @@ function App() {
     // });
     // }, []);
 
-    // keep track of summaries
-    // TODO: combine into one object
-    const [summaries, setSummaries] = useState<WikiSummary[]>([]);
-    const [currentSummary, setCurrentSummary] = useState<WikiSummary | null>(null);
-
-    // keep track of search bar input
-    const [input, setInput] = useState("");
+    // Move the alert logic to the APP.tsx since it's part of the global state,
+    // wire e.recordCount from there
+    // setRecordCount(e.recordCount);
+    // // close alert if new graph is rendered and record count is > 1
+    // if (e.recordCount > 1) {
+    //     setAlertState({
+    //         show: false,
+    //         type: AlertType.None,
+    //     });
+    // }
 
     return (
         <div>
@@ -80,8 +114,11 @@ function App() {
                         summaries={summaries}
                         setSummaries={setSummaries}
                         setCurrentSummary={setCurrentSummary}
+                        setAlertState={setAlertState}
                         darkMode={darkMode}
                     />
+                    {/* alert */}
+                    <Alert state={alertState}></Alert>
                     {/* sidebar */}
                     <Sidebar
                         input={input}
