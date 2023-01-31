@@ -60,7 +60,6 @@ function App() {
             // register record count event
             vis.registerOnEvent(NeoVisEvents.CompletionEvent, (e) => {
                 setRecordCount(e.recordCount);
-                console.log(e.recordCount);
             });
         };
         visLoader.load(onReady);
@@ -89,7 +88,6 @@ function App() {
 
     // ----- alert user if something went wrong -----
     useEffect(() => {
-        console.log(recordCount);
         // recordCount = number of nodes returned in the query
         if (recordCount === 0) {
             // if there's 0 nodes, there was no such page found (happens when user searches for page that does not exist)

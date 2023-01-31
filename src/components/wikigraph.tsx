@@ -14,12 +14,6 @@ const StyledCanvas = styled.div`
     position: fixed;
 `;
 
-StyledCanvas.defaultProps = {
-    theme: {
-        expanded: false,
-    },
-};
-
 interface Props {
     containerId: string;
     summaries: WikiSummary[];

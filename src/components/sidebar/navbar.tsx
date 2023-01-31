@@ -35,7 +35,7 @@ interface Props {
     setCurrentNavTab: Dispatch<SetStateAction<NavTab>>;
 }
 
-const NavBar: React.FC<Props> = ({ currentNavTab, setCurrentNavTab }) => {
+const NavBar: React.FC<Props> = React.memo(({ currentNavTab, setCurrentNavTab }) => {
     return (
         <StyledNav className="navigation">
             <ul>
@@ -63,6 +63,6 @@ const NavBar: React.FC<Props> = ({ currentNavTab, setCurrentNavTab }) => {
             </ul>
         </StyledNav>
     );
-};
+});
 
 export default NavBar;
