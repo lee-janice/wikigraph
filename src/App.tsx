@@ -8,6 +8,9 @@ import { VisContext } from "./context/visContext";
 import NeoVis, { NeoVisEvents } from "neovis.js";
 import Alert, { AlertState, AlertType } from "./components/alert";
 import styled from "styled-components";
+import ExpandButton from "./components/buttons/expand";
+import CenterButton from "./components/buttons/center";
+import StabilizeButton from "./components/buttons/stabilize";
 
 const StyledVisContainer = styled.div`
     height: ${(props) => (props.theme.expanded ? "100%;" : "80%;")}
@@ -50,6 +53,7 @@ function App() {
     // keep track of whether the vis is expanded
     const [visIsExpanded, setVisIsExpanded] = useState(false);
 
+    // load Vis and VisNetwork objects
     useEffect(() => {
         const onReady = (vis: NeoVis, e: any) => {
             if (!vis.network) {
@@ -120,29 +124,13 @@ function App() {
                             darkMode={darkMode}
                         />
                         {/* buttons */}
-                        <img
-                            src={
-                                visIsExpanded
-                                    ? darkMode
-                                        ? "icons/collapse-white.png"
-                                        : "icons/collapse.png"
-                                    : darkMode
-                                    ? "icons/expand-white.png"
-                                    : "icons/expand.png"
-                            }
-                            alt={visIsExpanded ? "Collapse visualization button" : "Expand visualization button"}
-                            className="vis-expand-button"
-                            onClick={() => setVisIsExpanded(!visIsExpanded)}
+                        <ExpandButton
+                            visIsExpanded={visIsExpanded}
+                            setVisIsExpanded={setVisIsExpanded}
+                            darkMode={darkMode}
                         />
-                        <input
-                            type="submit"
-                            value="Stabilize"
-                            id="stabilize-button"
-                            onClick={() => {
-                                vis?.stabilize();
-                            }}
-                        />
-                        <input type="submit" value="Center" id="center-button" onClick={() => visNetwork?.fit()} />
+                        <StabilizeButton vis={vis} />
+                        <CenterButton visNetwork={visNetwork} />
                         {/* alert */}
                         <Alert state={alertState}></Alert>
                     </StyledVisContainer>

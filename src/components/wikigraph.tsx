@@ -5,6 +5,7 @@ import { WikiSummary } from "./sidebar/wikipediaSummaries";
 import styled from "styled-components";
 import { AlertState, AlertType } from "./alert";
 import { VisContext } from "../context/visContext";
+import MobileContextButton from "./buttons/mobileContext";
 
 const StyledCanvas = styled.div`
     height: inherit;
@@ -39,13 +40,24 @@ const WikiGraph: React.FC<Props> = ({
     const [selectionLabels, setSelectionLabels] = useState([""]);
 
     // keep track of whether the context menu is open or closed
-    const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
+    const [contextMenuState, _setContextMenuState] = useState<ContextMenuState>({
         open: false,
         type: ContextMenuType.Canvas,
         mobile: window.innerWidth < 1100,
         x: 0,
         y: 0,
     });
+
+    // get reference to context menu state to use current value in event listener
+    const contextMenuStateRef = useRef(contextMenuState);
+
+    // update reference when state is updated
+    const setContextMenuState = (data: ContextMenuState) => {
+        contextMenuStateRef.current = data;
+        _setContextMenuState(data);
+    };
+
+    // change context menu state on window resize
     window.onresize = () => {
         if (window.innerWidth < 1100) {
             if (!contextMenuState.mobile) {
@@ -95,20 +107,25 @@ const WikiGraph: React.FC<Props> = ({
 
         // 2. listener for "click"
         visNetwork.onClick((click) => {
-            // close context menu
-            setContextMenuState({
-                open: false,
-                type: ContextMenuType.Canvas,
-                mobile: window.innerWidth < 1100,
-                x: 0,
-                y: 0,
-            });
+            if (contextMenuStateRef.current.open) {
+                // close context menu
+                setContextMenuState({
+                    open: false,
+                    type: ContextMenuType.Canvas,
+                    mobile: window.innerWidth < 1100,
+                    x: 0,
+                    y: 0,
+                });
+            }
 
+            // TODO: find out how to do this
+            // if (alertStateRef.current.show) {
             // close alert
             setAlertState({
                 show: false,
                 type: AlertType.None,
             });
+            // }
         });
 
         // 3. listener for "double click"
@@ -159,29 +176,11 @@ const WikiGraph: React.FC<Props> = ({
             <div id={containerId} />
             {!vis && <h2 style={{ position: `absolute`, right: `25px`, bottom: `5px` }}>Loading...</h2>}
             {contextMenuState.mobile && (
-                <img
-                    src={
-                        contextMenuState.open
-                            ? darkMode
-                                ? "icons/close-white.png"
-                                : "icons/close.png"
-                            : darkMode
-                            ? "icons/kebab-white.png"
-                            : "icons/kebab.png"
-                    }
-                    alt={contextMenuState.open ? "Close context menu button" : "Open context menu button"}
-                    className="mobile-context-button"
-                    onClick={() => {
-                        var type;
-                        if (selection.length === 0) {
-                            type = ContextMenuType.Canvas;
-                        } else if (selection.length === 1) {
-                            type = ContextMenuType.Node;
-                        } else {
-                            type = ContextMenuType.Nodes;
-                        }
-                        setContextMenuState({ ...contextMenuState, open: !contextMenuState.open, type: type });
-                    }}
+                <MobileContextButton
+                    contextMenuState={contextMenuState}
+                    setContextMenuState={setContextMenuState}
+                    selection={selection}
+                    darkMode={darkMode}
                 />
             )}
             {vis && visNetwork && (

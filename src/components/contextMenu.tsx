@@ -25,7 +25,7 @@ interface Props {
     visNetwork: VisNetwork;
     darkMode: boolean;
     state: ContextMenuState;
-    setState: Dispatch<SetStateAction<ContextMenuState>>;
+    setState: (data: ContextMenuState) => void;
     selection: IdType[];
     setSelection: Dispatch<SetStateAction<IdType[]>>;
     selectionLabels: string[];
@@ -62,6 +62,10 @@ const ContextMenu: React.FC<Props> = ({
               borderRadius: `5px`,
               backgroundColor: darkMode ? `#202122f2` : `#fffffff2`,
           };
+
+    if (!state.open) {
+        return <div className="context-menu" id="context-menu" style={style}></div>;
+    }
 
     // ----- event handler for "Update Graph with Selection" button press -----
     const handleCreateNewGraph = () => {
