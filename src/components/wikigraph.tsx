@@ -107,6 +107,9 @@ const WikiGraph: React.FC<Props> = ({
 
         // 2. listener for "click"
         visNetwork.onClick((click) => {
+            // we want to use a reference in the event listener so that we only change the state on click
+            // if the context menu is currently open
+            // otherwise, it changes the state every time and causes the parent component to rerender
             if (contextMenuStateRef.current.open) {
                 // close context menu
                 setContextMenuState({
@@ -119,6 +122,8 @@ const WikiGraph: React.FC<Props> = ({
             }
 
             // TODO: find out how to do this
+            // it doesn't work the same way as the context menu because the alert lives in the App,
+            // not in this component
             // if (alertStateRef.current.show) {
             // close alert
             setAlertState({

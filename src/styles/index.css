@@ -227,6 +227,8 @@ input:focus {
     text-align: left;
     height: 2.5em;
     scrollbar-width: none; /* disable scroll bar on firefox */
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
 
 /* disable scroll bar on gchrome */
@@ -258,7 +260,6 @@ input:focus {
 
 .tab-selected {
     margin-bottom: -4px;
-    z-index: 100000;
     box-shadow: 0 0 3px 0 var(--borderColor);
     background-color: var(--secondaryBackgroundColor);
 }
