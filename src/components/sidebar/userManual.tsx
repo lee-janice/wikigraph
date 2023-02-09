@@ -106,7 +106,7 @@ const UserManual: React.FC = () => {
             You can also select nodes in the graph:
             <ul>
                 <li>
-                    <strong>To select a singular node:</strong> left- or right-click on the node.
+                    <strong>To select a singular node:</strong> left-click on the node.
                 </li>
                 <li>
                     <strong>To select multiple nodes:</strong> command-click or long-press on the nodes you want to
@@ -129,12 +129,21 @@ const UserManual: React.FC = () => {
             context menu provides the user with a couple of different options:
             <ul>
                 <li>
+                    <strong>Load summary from Wikipedia:</strong> this option fetches the extract of the article from
+                    Wikipedia and displays it in the Wikipedia Summaries section of the Home tab.
+                </li>
+                <li>
                     <strong>Create new graph with selection:</strong> this option renders a new graph containing the
                     selected node, all of the nodes that are connected to it, and the edges connecting the nodes.
                 </li>
                 <li>
-                    <strong>Load summary from Wikipedia:</strong> this option fetches the extract of the article from
-                    Wikipedia and displays it in the Wikipedia Summaries section of the Home tab.
+                    <strong>Keep selected node:</strong> this option removes all nodes except the selected node from the
+                    graph.
+                </li>
+                <li>
+                    <strong>Expand node links:</strong> this option has the same function as double-clicking the node—it
+                    will update the graph with all of the nodes linked to the selected node in the database. This option
+                    is necessary for mobile interfaces, since double-clicks are not registered on mobile.
                 </li>
                 <li>
                     <strong>Delete node:</strong> this option deletes the selected node from the graph.
@@ -148,8 +157,18 @@ const UserManual: React.FC = () => {
                 <code>Nodes</code>
             </h3>
             This context is activated when there is a node underneath the cursor and <em>multiple</em> nodes are
-            selected. The options in this menu are identical to the ones for <code>Node</code>, except they apply to all
-            selected nodes rather than a singular node.
+            selected. The options in this menu are mostly identical to the ones for <code>Node</code>, except they apply
+            to all selected nodes rather than a singular node.
+            <br />
+            <br />
+            There is one exception, which is occurs when you select <strong>two</strong> nodes. This context unlocks a
+            new option, which is
+            <ul>
+                <li>
+                    <strong>Find path between nodes:</strong> this option finds and displays the shortest path between
+                    the two selected nodes, if it exists.
+                </li>
+            </ul>
             <h3>
                 <code>Canvas</code>
             </h3>
@@ -166,7 +185,17 @@ const UserManual: React.FC = () => {
             <p>
                 You can search for a Wikipedia article and render its graph using the search bar. The search is case
                 insensitive and uses a fuzzy match, so it'll update the graph with the closest match to your search
-                query. If no match is found, there will be no graph rendered and the visualization will be blank.
+                query. There are two options, which are:
+                <ul>
+                    <li>
+                        <strong>Create new graph:</strong> this option creates a new graph using your search. If no
+                        match is found, there will be no graph rendered and the visualization will be blank.
+                    </li>
+                    <li>
+                        <strong>Add to graph:</strong> this option adds the searched node to your current graph. If no
+                        node is found, no nodes will be added to the graph.
+                    </li>
+                </ul>
             </p>
         </div>
     );
