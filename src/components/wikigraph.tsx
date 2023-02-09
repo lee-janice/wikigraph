@@ -157,12 +157,15 @@ const WikiGraph: React.FC<Props> = ({
             // check if there's a node under the cursor
             var nodeId = visNetwork.getNodeAt({ x: correctedX, y: correctedY });
             // update context menu state based on check
-            if (nodeId) {
+            if (nodeId && selectionRef.current.length > 0) {
+                // if there is a node under the cursor AND there is a selected node, change type to Node/Nodes
+                // had to add the second part to handle the case where there are no nodes selected and user right-clicks a node (now that right-click doesn't select the node)
                 const nodeIds = visNetwork.getSelectedNodes();
                 if (nodeIds) {
                     nodeIds.length > 1 ? (type = ContextMenuType.Nodes) : (type = ContextMenuType.Node);
                 }
             } else {
+                // otherwise type should be canvas
                 type = ContextMenuType.Canvas;
             }
 
