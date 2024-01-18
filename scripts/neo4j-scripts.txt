@@ -1,0 +1,117 @@
+CREATE CONSTRAINT FOR (p:Page) REQUIRE p.title IS UNIQUE
+
+
+CALL apoc.periodic.iterate(
+	'LOAD CSV FROM "file:///clickstream-enwiki-2022-10.csv" AS line RETURN line',
+	'MERGE (p1:Page {title: line[0]}) MERGE (p2:Page {title: line[1]}) CREATE(p1)-[:LINKS_TO {type: line[2], quantity:toInteger(line[3])}]-> (p2)',
+	{batchsize:500, iterateList:true, parallel:false}
+)
+
+
+# get number of clicks into a page 
+MATCH (p1:Page)-[l:LINKS_TO]->(p2:Page)
+WHERE p1.title = 'Universe' WITH p1, p2, l
+CALL {
+WITH p2
+match (:Page)-[links:LINKS_TO]->(current:Page) where current.title = p2.title
+return sum(links.quantity) as numClicksInto
+}
+RETURN p1, p2, l, numClicksInto
+
+
+CALL apoc.periodic.iterate(
+'MATCH (:Page)-[l:LINKS_TO]->(p:Page) RETURN p, sum(l.quantity) as clicks',
+'SET p.clicksInto = clicks',
+{batchsize:100}
+)
+
+CALL apoc.periodic.iterate(
+'MATCH (s:Page)-[:LINKS_TO]->(d:Page) RETURN d, count(s) as count',
+'SET d.pagesInto = count',
+{batchsize:100}
+)
+
+
+match path = (s:Page)-[l:LINKS_TO]->(d:Page)
+with d, path
+order by d.clicksInto desc
+limit 400000
+with collect (path) as paths
+CALL apoc.graph.fromPaths(paths, "producers", {})
+YIELD graph AS g
+CALL apoc.static.set("producers.cached", g)
+YIELD value
+RETURN value, g
+
+
+match (s:Page)-[l:LINKS_TO]->(d:Page)
+with s, l, d
+order by d.clicksInto desc
+limit 10
+with collect(distinct s) as sources, collect(distinct d) as destinations, collect(distinct l) as links
+with sources+destinations as export_nodes, links as export_relations
+call apoc.export.cypher.data(export_nodes, export_relations, '/export.cypher', {format: 'cypher-shell'})
+yield file, source, format, nodes, relationships, properties, time
+return nodes, relationships, time
+
+
+call apoc.periodic.iterate(
+'call {
+match (:Page)-[:LINKS_TO]-(p:Page)
+with distinct p
+order by p.pagesInto desc
+limit 400000
+return collect(p) as pages
+}
+match (p:Page)
+where not p in pages
+return p
+',
+'detach delete p',
+{batchsize: 100, iterateList:true, parallel:false}
+)
+
+call apoc.periodic.iterate(
+'match (:Page)-[:LINKS_TO]-(p:Page)
+where p.pagesInto < 36
+return p
+',
+'detach delete p',
+{batchsize: 100, iterateList:true, parallel:false}
+)
+
+match (n) where not (n)--() return count(n)
+
+
+
+
+
+# SUBSETTING DATA
+
+call apoc.periodic.iterate(
+'match (:Page)-[l:LINKS_TO]-(:Page)
+where l.quantity < 750
+return l
+',
+'delete l',
+{batchsize: 100, iterateList:true, parallel:false}
+)
+
+call apoc.periodic.iterate(
+'match (n) where not (n)--() return n
+',
+'delete n',
+{batchsize: 100, iterateList:true, parallel:false}
+)
+
+match (:Page)-[:LINKS_TO]-(p:Page)
+where p.pagesInto < 2
+detach delete p
+
+
+
+
+
+
+
+
